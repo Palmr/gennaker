@@ -35,6 +35,16 @@ public class PublisherProxyBuilder implements JavaProxy {
         writer.write(interfaceName);
         writer.write(" {\n");
         writer.write("    private final UnsafeBuffer buffer = new UnsafeBuffer(ByteBuffer.allocate(" + maxMessageSize + "));\n");
+        writer.write("    private final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();\n");
+        writer.write(methods.stream()
+                .map(m -> {
+                    final var methodName = m.getSimpleName().toString();
+                    final var sbeEncoderClassName = getSbeEncoderClassName(methodName);
+                    final var sbeEncoderName = getSbeEncoderName(methodName);
+                    return "    private final " + sbeEncoderClassName + " " + sbeEncoderName + " = new " + sbeEncoderClassName + "();\n";
+                })
+                .distinct()
+                .collect(Collectors.joining()));
         writer.write("    private final Transport transport;\n\n");
         writer.write("    public ");
         writer.write(className);
@@ -65,28 +75,29 @@ public class PublisherProxyBuilder implements JavaProxy {
             writer.write("(");
             writer.write(methodElement.getParameters().stream().map(p -> p.asType() + " " + p.getSimpleName()).collect(Collectors.joining(", ")));
             writer.write(") {\n");
-            writer.write("        var headerEncoder = new MessageHeaderEncoder();\n");
-            writer.write("        var dataEncoder = new ");
-            writer.write(getSbeEncoderName(methodName));
-            writer.write("();\n");
-            writer.write("""
-                            var encoder = dataEncoder.wrapAndApplyHeader(buffer, 0, headerEncoder);
-                    """);
+            writer.write("        var methodEncoder = " + getSbeEncoderName(methodName) + ".wrapAndApplyHeader(buffer, 0, headerEncoder);\n");
             writer.write(
                     methodElement.getParameters().stream()
-                            .map(p -> "        encoder." + p.getSimpleName() + "(" + p.getSimpleName() + ");\n").collect(Collectors.joining())
+                            .map(p -> "        methodEncoder." + p.getSimpleName() + "(" + p.getSimpleName() + ");\n").collect(Collectors.joining())
             );
 
-            writer.write("        transport.publish(");
+            writer.write("        if (!transport.publish(");
             writer.write(interfaceName);
-            writer.write(".class, buffer, headerEncoder.ENCODED_LENGTH + encoder.encodedLength());\n");
+            writer.write(".class, buffer, headerEncoder.ENCODED_LENGTH + methodEncoder.encodedLength())) {\n");
+            writer.write("            throw new UnsupportedOperationException(\"Failed to publish, this case yet to be implemented by Gennaker\"); // TODO: implement this case\n");
+            writer.write("        }\n");
             writer.write("        return;\n");
             writer.write("    }\n\n");
         }
     }
 
     private static String getSbeEncoderName(final String methodName) {
-        return methodName.substring(0, 1).toUpperCase() + methodName.substring(1) + "Encoder";
+        return methodName + "Encoder";
+    }
+
+    private static String getSbeEncoderClassName(final String methodName) {
+        final var sbeEncoderName = getSbeEncoderName(methodName);
+        return sbeEncoderName.substring(0, 1).toUpperCase() + sbeEncoderName.substring(1);
     }
 
     public void method(final ExecutableElement methodElement) {
