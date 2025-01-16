@@ -79,7 +79,7 @@ public class PublisherProxyBuilder implements JavaProxy {
 
             writer.write("        transport.publish(");
             writer.write(interfaceName);
-            writer.write(".class, buffer, encoder.limit());\n");
+            writer.write(".class, buffer, headerEncoder.ENCODED_LENGTH + encoder.encodedLength());\n");
             writer.write("        return;\n");
             writer.write("    }\n\n");
         }
