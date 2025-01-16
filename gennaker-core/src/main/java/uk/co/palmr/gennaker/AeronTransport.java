@@ -31,7 +31,7 @@ public class AeronTransport implements Transport {
         final var mediaDriverCtx = new MediaDriver.Context()
                 .dirDeleteOnStart(true)
                 .threadingMode(ThreadingMode.SHARED)
-                .sharedIdleStrategy(new SleepingIdleStrategy())
+                .sharedIdleStrategy(idle)
                 .dirDeleteOnShutdown(true);
         mediaDriver = MediaDriver.launchEmbedded(mediaDriverCtx);
 
@@ -41,50 +41,46 @@ public class AeronTransport implements Transport {
     }
 
     @Override
-    public <T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
-        try (var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> aeron.addPublication("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())))) {
-            if (pub.isConnected()) {
-                while (pub.offer(message, 0, limit) < 0) {
-                    idle.idle();
-                }
-                return true;
-            }
+    public boolean publish(final Class topicClass, final DirectBuffer message, final int limit) {
+        final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> aeron.addPublication("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())));
+        while (pub.offer(message, 0, limit) < 0) {
+            idle.idle();
         }
-        return false;
+        return true;
     }
 
     @Override
-    public <T> void subscribe(final Class<T> topicClass, final Object impl) {
+    public void subscribe(final Class topicClass, final Object impl) {
         final AgentRunner subscriberRunner;
-        try (var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())))) {
-            final String className = topicClass.getCanonicalName() + SUB_PROXY_CLASS_SUFFIX;
-            final FragmentHandler subProxy;
-            try {
-                @SuppressWarnings("unchecked") final Class<? extends FragmentHandler> proxyClass = (Class<? extends FragmentHandler>) Class.forName(className);
-                subProxy = proxyClass.getConstructor(topicClass).newInstance(impl);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Failed to locate class " + className, e);
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException("Failed to instantiate class " + className, e);
+        var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())));
+        final String className = topicClass.getCanonicalName() + SUB_PROXY_CLASS_SUFFIX;
+        final FragmentHandler subProxy;
+        try {
+            @SuppressWarnings("unchecked") final Class<? extends FragmentHandler> proxyClass = (Class<? extends FragmentHandler>) Class.forName(className);
+            subProxy = proxyClass.getConstructor(topicClass).newInstance(impl);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to locate class " + className, e);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException("Failed to instantiate class " + className, e);
+        }
+
+        final var fragmentAssembler = new FragmentAssembler(subProxy);
+
+        subscriberRunner = new AgentRunner(idle,
+                Throwable::printStackTrace, null, new Agent() {
+            @Override
+            public int doWork() {
+                sub.poll(fragmentAssembler, 100);
+                return 0;
             }
 
-            final var fragmentAssembler = new FragmentAssembler(subProxy);
+            @Override
+            public String roleName() {
+                return "Aeron-Subscription: " + topicClass.getSimpleName();
+            }
+        });
 
-            subscriberRunner = new AgentRunner(idle,
-                    Throwable::printStackTrace, null, new Agent() {
-                @Override
-                public int doWork() {
-                    sub.poll(fragmentAssembler, 100);
-                    return 0;
-                }
-
-                @Override
-                public String roleName() {
-                    return "Aeron-Subscription: " + topicClass.getSimpleName();
-                }
-            });
-        }
         AgentRunner.startOnThread(subscriberRunner);
     }
 }
