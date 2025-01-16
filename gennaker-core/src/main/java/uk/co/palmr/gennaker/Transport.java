@@ -3,6 +3,8 @@ package uk.co.palmr.gennaker;
 import org.agrona.DirectBuffer;
 
 public interface Transport {
-    <T> boolean publish(Class<T> topicClass, DirectBuffer message, int limit);
-    <T> void subscribe(Class<T> topicClass, Object impl);
+    <T, I extends T> boolean publish(Class<T> topicClazz, DirectBuffer message, int limit);
+    <T, I extends T> void subscribe(Class<T> topicClazz, I impl);
+
+    void shutdown();
 }

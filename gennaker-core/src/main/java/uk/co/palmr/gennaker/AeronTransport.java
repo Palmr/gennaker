@@ -6,19 +6,18 @@ import io.aeron.Publication;
 import io.aeron.Subscription;
 import io.aeron.driver.MediaDriver;
 import io.aeron.driver.ThreadingMode;
+import org.agrona.CloseHelper;
 import org.agrona.DirectBuffer;
 import org.agrona.concurrent.Agent;
 import org.agrona.concurrent.AgentRunner;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.SleepingIdleStrategy;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import static uk.co.palmr.gennaker.Gennaker.SUB_PROXY_CLASS_SUFFIX;
-
 public class AeronTransport implements Transport {
+    public static final String AERON_URI = "aeron:ipc?alias=gennaker";
     private final IdleStrategy idle = new SleepingIdleStrategy();
     private final MediaDriver mediaDriver;
     private final Aeron aeron;
@@ -40,8 +39,8 @@ public class AeronTransport implements Transport {
     }
 
     @Override
-    public boolean publish(final Class topicClass, final DirectBuffer message, final int limit) {
-        final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> aeron.addPublication("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())));
+    public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
+        final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> aeron.addPublication(AERON_URI, getStreamId(tc)));
         while (pub.offer(message, 0, limit) < 0) {
             idle.idle();
         }
@@ -49,22 +48,13 @@ public class AeronTransport implements Transport {
     }
 
     @Override
-    public void subscribe(final Class topicClass, final Object impl) {
+    public <T, I extends T> void subscribe(final Class<T> topicClass, final I impl) {
         final AgentRunner subscriberRunner;
-        var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())));
-        final String className = topicClass.getCanonicalName() + SUB_PROXY_CLASS_SUFFIX;
-        final MessageHandler subProxy;
-        try {
-            @SuppressWarnings("unchecked") final Class<? extends MessageHandler> proxyClass = (Class<? extends MessageHandler>) Class.forName(className);
-            subProxy = proxyClass.getConstructor(topicClass).newInstance(impl);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to locate class " + className, e);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-                 NoSuchMethodException e) {
-            throw new RuntimeException("Failed to instantiate class " + className, e);
-        }
+        var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription(AERON_URI, getStreamId(tc)));
 
-        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> subProxy.onMessage(buf, offset, len));
+        final var subscriberProxy = ClassHunter.getSubscriberProxy(topicClass, impl);
+
+        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> subscriberProxy.onMessage(buf, offset, len));
 
         subscriberRunner = new AgentRunner(idle,
                 Throwable::printStackTrace, null, new Agent() {
@@ -76,10 +66,23 @@ public class AeronTransport implements Transport {
 
             @Override
             public String roleName() {
-                return "Aeron-Subscription: " + topicClass.getSimpleName();
+                return "Gennaker-subscriber: " + topicClass.getSimpleName();
             }
         });
 
         AgentRunner.startOnThread(subscriberRunner);
+    }
+
+    @Override
+    public void shutdown() {
+        CloseHelper.quietCloseAll(publishersByTopic.values());
+        CloseHelper.quietCloseAll(subscribersByTopic.values());
+        CloseHelper.quietClose(aeron);
+        CloseHelper.quietClose(mediaDriver);
+    }
+
+    private Integer getStreamId(final Class topicClass) {
+        // TODO: This is a terrible idea. I apologise.
+        return streamIdByTopic.computeIfAbsent(topicClass, Object::hashCode);
     }
 }
