@@ -25,11 +25,11 @@ public class SubscriberProxyBuilder implements JavaProxy {
         writer.write("package ");
         writer.write(packageName);
         writer.write(";\n\n");
-        writer.write("import org.agrona.DirectBuffer;\n");
-        writer.write("import uk.co.palmr.gennaker.MessageHandler;\n");
-        writer.write("import uk.co.palmr.gennaker.Transport;\n");
-        writer.write("import org.agrona.concurrent.UnsafeBuffer;\n");
-        writer.write("import java.nio.ByteBuffer;\n");
+        writer.write("""
+                import org.agrona.DirectBuffer;
+                import uk.co.palmr.gennaker.MessageHandler;
+                
+                """);
         writer.write("public class ");
         writer.write(className);
         writer.write(" implements MessageHandler {\n");
@@ -55,27 +55,26 @@ public class SubscriberProxyBuilder implements JavaProxy {
                             throw new UnsupportedOperationException("Message too short, this case yet to be implemented by Gennaker"); // TODO: implement this case
                         }
                         messageHeaderDecoder.wrap(buffer, offset);
-                        switch (messageHeaderDecoder.templateId())
-                        {
+                        switch (messageHeaderDecoder.templateId()) {
                 """);
         for (final var method : methods) {
             final var methodName = method.getSimpleName().toString();
-            writer.write("             case ");
+            writer.write("            case ");
             final var sbeDecoderName = getSbeDecoderName(methodName);
             writer.write(sbeDecoderName);
             writer.write(".TEMPLATE_ID -> {\n");
-            writer.write("                    final var msgDecoder = new " + sbeDecoderName + "();\n" +
-                    "                    msgDecoder.wrap(buffer, offset + MessageHeaderDecoder.ENCODED_LENGTH, messageHeaderDecoder.blockLength(), messageHeaderDecoder.version());\n" +
-                    "                    delegate." + methodName + "(");
+            writer.write("                final var msgDecoder = new " + sbeDecoderName + "();\n" +
+                    "                msgDecoder.wrap(buffer, offset + MessageHeaderDecoder.ENCODED_LENGTH, messageHeaderDecoder.blockLength(), messageHeaderDecoder.version());\n" +
+                    "                delegate." + methodName + "(");
             writer.write(method.getParameters().stream().map(param -> "msgDecoder." + param.getSimpleName() + "()").collect(Collectors.joining(", ")));
             writer.write(");\n");
-            writer.write("             }\n");
+            writer.write("            }\n");
 
         }
         writer.write("""
-                             default -> System.err.println("unknown message type: " + messageHeaderDecoder.templateId());
-                         }
-                     }
+                            default -> System.err.println("unknown message type: " + messageHeaderDecoder.templateId());
+                        }
+                    }
                 """);
         writer.write("}\n");
     }

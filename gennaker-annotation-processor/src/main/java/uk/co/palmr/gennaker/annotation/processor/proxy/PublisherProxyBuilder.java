@@ -26,8 +26,8 @@ public class PublisherProxyBuilder implements JavaProxy {
         writer.write("package ");
         writer.write(packageName);
         writer.write(";\n\n");
-        writer.write("import uk.co.palmr.gennaker.Transport;\n");
         writer.write("import org.agrona.concurrent.UnsafeBuffer;\n");
+        writer.write("import uk.co.palmr.gennaker.Transport;\n\n");
         writer.write("import java.nio.ByteBuffer;\n\n");
         writer.write("public class ");
         writer.write(className);
