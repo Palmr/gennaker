@@ -25,15 +25,14 @@ public class SubscriberProxyBuilder implements JavaProxy {
         writer.write("package ");
         writer.write(packageName);
         writer.write(";\n\n");
-        writer.write("import io.aeron.logbuffer.FragmentHandler;\n");
-        writer.write("import io.aeron.logbuffer.Header;\n");
         writer.write("import org.agrona.DirectBuffer;\n");
+        writer.write("import uk.co.palmr.gennaker.MessageHandler;\n");
         writer.write("import uk.co.palmr.gennaker.Transport;\n");
         writer.write("import org.agrona.concurrent.UnsafeBuffer;\n");
         writer.write("import java.nio.ByteBuffer;\n");
         writer.write("public class ");
         writer.write(className);
-        writer.write(" implements FragmentHandler {\n");
+        writer.write(" implements MessageHandler {\n");
         writer.write("    private final MessageHeaderDecoder messageHeaderDecoder = new MessageHeaderDecoder();\n");
         writer.write("    private final " + interfaceName + " delegate;\n\n");
         writer.write("    public ");
@@ -51,10 +50,9 @@ public class SubscriberProxyBuilder implements JavaProxy {
         writeHeader(writer);
 
         writer.write("""
-                    public void onFragment(DirectBuffer buffer, int offset, int length, Header header) {
+                    public void onMessage(final DirectBuffer buffer, final int offset, final int length) {
                         if (length < MessageHeaderDecoder.ENCODED_LENGTH) {
-                            System.err.println("Message too short");
-                            return;
+                            throw new UnsupportedOperationException("Message too short, this case yet to be implemented by Gennaker"); // TODO: implement this case
                         }
                         messageHeaderDecoder.wrap(buffer, offset);
                         switch (messageHeaderDecoder.templateId())
@@ -77,10 +75,6 @@ public class SubscriberProxyBuilder implements JavaProxy {
         writer.write("""
                              default -> System.err.println("unknown message type: " + messageHeaderDecoder.templateId());
                          }
-                     }
-                    \s
-                     public void handleEvent(DirectBuffer buffer, int offset) {
-                         System.out.println("TODO: Invoke subscriber method here");
                      }
                 """);
         writer.write("}\n");

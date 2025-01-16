@@ -6,7 +6,6 @@ import io.aeron.Publication;
 import io.aeron.Subscription;
 import io.aeron.driver.MediaDriver;
 import io.aeron.driver.ThreadingMode;
-import io.aeron.logbuffer.FragmentHandler;
 import org.agrona.DirectBuffer;
 import org.agrona.concurrent.Agent;
 import org.agrona.concurrent.AgentRunner;
@@ -54,9 +53,9 @@ public class AeronTransport implements Transport {
         final AgentRunner subscriberRunner;
         var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription("aeron:ipc?alias=gennaker", streamIdByTopic.computeIfAbsent(tc, x -> streamIdByTopic.size())));
         final String className = topicClass.getCanonicalName() + SUB_PROXY_CLASS_SUFFIX;
-        final FragmentHandler subProxy;
+        final MessageHandler subProxy;
         try {
-            @SuppressWarnings("unchecked") final Class<? extends FragmentHandler> proxyClass = (Class<? extends FragmentHandler>) Class.forName(className);
+            @SuppressWarnings("unchecked") final Class<? extends MessageHandler> proxyClass = (Class<? extends MessageHandler>) Class.forName(className);
             subProxy = proxyClass.getConstructor(topicClass).newInstance(impl);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to locate class " + className, e);
@@ -65,7 +64,7 @@ public class AeronTransport implements Transport {
             throw new RuntimeException("Failed to instantiate class " + className, e);
         }
 
-        final var fragmentAssembler = new FragmentAssembler(subProxy);
+        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> subProxy.onMessage(buf, offset, len));
 
         subscriberRunner = new AgentRunner(idle,
                 Throwable::printStackTrace, null, new Agent() {

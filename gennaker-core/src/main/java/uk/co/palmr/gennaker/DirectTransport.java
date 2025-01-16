@@ -1,6 +1,5 @@
 package uk.co.palmr.gennaker;
 
-import io.aeron.logbuffer.FragmentHandler;
 import org.agrona.DirectBuffer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,10 +16,10 @@ public class DirectTransport implements Transport {
     @Override
     public <T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         subscribersByTopic.get(topicClass).forEach(subscriber -> {
-            final FragmentHandler subProxy;
+            final MessageHandler subProxy;
             final String className = topicClass.getCanonicalName() + SUB_PROXY_CLASS_SUFFIX;
             try {
-                @SuppressWarnings("unchecked") final Class<? extends FragmentHandler> proxyClass = (Class<? extends FragmentHandler>) Class.forName(className);
+                @SuppressWarnings("unchecked") final Class<? extends MessageHandler> proxyClass = (Class<? extends MessageHandler>) Class.forName(className);
                 subProxy = proxyClass.getConstructor(topicClass).newInstance(subscriber);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException("Failed to locate class " + className, e);
@@ -28,7 +27,7 @@ public class DirectTransport implements Transport {
                      NoSuchMethodException e) {
                 throw new RuntimeException("Failed to instantiate class " + className, e);
             }
-            subProxy.onFragment(message, 0, limit, null);
+            subProxy.onMessage(message, 0, limit);
         });
         return true;
     }
