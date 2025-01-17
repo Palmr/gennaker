@@ -11,7 +11,7 @@ class GennakerTest {
 
     @Test
     void shouldDoTheBasics() {
-        final Gennaker gennaker = new Gennaker();
+        final Gennaker gennaker = new Gennaker(new DirectTransport());
         gennaker.subscribe(TestTopic.class, topicImplementation);
 
 
@@ -33,7 +33,7 @@ class GennakerTest {
 
     @Test
     void shouldHandleLateJoin() {
-        final Gennaker gennaker = new Gennaker();
+        final Gennaker gennaker = new Gennaker(new DirectTransport());
         TestTopic publisher = gennaker.publisher(TestTopic.class);
 
 
@@ -46,7 +46,7 @@ class GennakerTest {
 
     @Test
     void shouldBroadcastToAllSubscribers() {
-        final Gennaker gennaker = new Gennaker();
+        final Gennaker gennaker = new Gennaker(new DirectTransport());
         gennaker.subscribe(TestTopic.class, topicImplementation);
 
         final TestTopicImpl otherImpl = new TestTopicImpl();

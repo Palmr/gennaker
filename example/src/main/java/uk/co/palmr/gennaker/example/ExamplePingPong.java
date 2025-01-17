@@ -1,5 +1,6 @@
 package uk.co.palmr.gennaker.example;
 
+import uk.co.palmr.gennaker.AeronTransport;
 import uk.co.palmr.gennaker.Gennaker;
 
 import java.time.Instant;
@@ -8,9 +9,9 @@ import java.util.concurrent.locks.LockSupport;
 
 import static java.time.ZoneOffset.UTC;
 
-public class PingMain {
+public class ExamplePingPong {
     public static void main(String[] args) {
-        final var gennaker = new Gennaker();
+        final var gennaker = new Gennaker(new AeronTransport());
 
         gennaker.subscribe(Pong.class, new PongHandler());
 
@@ -19,28 +20,28 @@ public class PingMain {
 
         gennaker.subscribe(Ping.class, new Ping() {
             @Override
-            public void handlePing(final String message) {
+            public void doPing(final String message) {
                 System.out.println("Received Ping: " + message);
-                pongPublisher.handlePong("Pong: " + message);
+                pongPublisher.doPong("Pong: " + message);
             }
 
             @Override
-            public void handlePing2(final int count, final String message) {
+            public void doRepeat(final int count, final String message) {
                 System.out.println("Received Ping2: " + message.repeat(count));
             }
         });
 
         while (!Thread.interrupted()) {
             final var now = Instant.now().atZone(UTC);
-            pingPublisher.handlePing("Ping @ " + now);
-            pingPublisher.handlePing2(now.getSecond(), "Repeat Me! ");
+            pingPublisher.doPing("Ping @ " + now);
+            pingPublisher.doRepeat(now.getSecond(), "Repeat Me! ");
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
         }
     }
 
     private static class PongHandler implements Pong {
         @Override
-        public void handlePong(String message) {
+        public void doPong(String message) {
             System.out.println("Received Pong: " + message);
         }
     }

@@ -11,11 +11,11 @@ public class DirectTransport implements Transport {
     @SuppressWarnings("rawtypes")
     private final Map<Class, List<Object>> subscribersByTopic = new IdentityHashMap<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         subscribersByTopic.get(topicClass).forEach(subscriber -> {
-            //noinspection unchecked
-            ClassHunter.getSubscriberProxy(topicClass, (I)subscriber).onMessage(message, 0, limit);
+            ClassHunter.getSubscriberProxy(topicClass, (I) subscriber).onMessage(message, 0, limit);
         });
         return true;
     }
