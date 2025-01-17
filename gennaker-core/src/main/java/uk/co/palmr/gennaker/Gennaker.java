@@ -15,4 +15,8 @@ public class Gennaker {
     public <T> T publisher(final Class<T> topicClass) {
         return ClassHunter.getPublisherProxy(topicClass, transport);
     }
+
+    public void shutdown() {
+        transport.shutdown();
+    }
 }

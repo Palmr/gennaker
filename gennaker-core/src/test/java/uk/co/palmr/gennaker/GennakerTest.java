@@ -1,5 +1,7 @@
 package uk.co.palmr.gennaker;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -8,10 +10,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GennakerTest {
     private final TestTopicImpl topicImplementation = new TestTopicImpl();
+    private Gennaker gennaker;
+
+    @BeforeEach
+    void setUp() {
+        gennaker = new Gennaker(new DirectTransport());
+    }
+
+    @AfterEach
+    void tearDown() {
+        gennaker.shutdown();
+    }
 
     @Test
     void shouldDoTheBasics() {
-        final Gennaker gennaker = new Gennaker(new DirectTransport());
         gennaker.subscribe(TestTopic.class, topicImplementation);
 
 
@@ -33,7 +45,6 @@ class GennakerTest {
 
     @Test
     void shouldHandleLateJoin() {
-        final Gennaker gennaker = new Gennaker(new DirectTransport());
         TestTopic publisher = gennaker.publisher(TestTopic.class);
 
 
@@ -46,7 +57,6 @@ class GennakerTest {
 
     @Test
     void shouldBroadcastToAllSubscribers() {
-        final Gennaker gennaker = new Gennaker(new DirectTransport());
         gennaker.subscribe(TestTopic.class, topicImplementation);
 
         final TestTopicImpl otherImpl = new TestTopicImpl();
