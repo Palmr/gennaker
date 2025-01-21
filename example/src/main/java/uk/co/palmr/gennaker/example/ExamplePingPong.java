@@ -10,7 +10,7 @@ import java.util.concurrent.locks.LockSupport;
 import static java.time.ZoneOffset.UTC;
 
 public class ExamplePingPong {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final var gennaker = new Gennaker(new AeronTransport());
 
         final var pingPublisher = gennaker.publisher(Ping.class);
@@ -31,10 +31,10 @@ public class ExamplePingPong {
         gennaker.shutdown();
     }
 
-    private static class PingHandler implements Ping {
+    private static final class PingHandler implements Ping {
         private final Pong pongPublisher;
 
-        public PingHandler(final Pong pongPublisher) {
+        PingHandler(final Pong pongPublisher) {
             this.pongPublisher = pongPublisher;
         }
 
@@ -51,9 +51,9 @@ public class ExamplePingPong {
         }
     }
 
-    private static class PongHandler implements Pong {
+    private static final class PongHandler implements Pong {
         @Override
-        public void doPong(String message) {
+        public void doPong(final String message) {
             System.out.println("Received Pong: " + message);
         }
     }

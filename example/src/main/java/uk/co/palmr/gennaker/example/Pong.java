@@ -4,5 +4,5 @@ import uk.co.palmr.gennaker.annotations.Topic;
 
 @Topic
 public interface Pong {
-    void doPong(final String message);
+    void doPong(String message);
 }

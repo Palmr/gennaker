@@ -1,5 +1,5 @@
 plugins {
-    id("java-library")
+    id("java-conventions")
 }
 
 repositories {
@@ -17,8 +17,4 @@ dependencies {
     implementation(libs.sbe)
     api(libs.agrona)
     api(libs.aeron)
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
