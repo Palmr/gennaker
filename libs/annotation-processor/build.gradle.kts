@@ -10,7 +10,7 @@ dependencies {
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
     compileOnly("com.google.auto.service:auto-service:1.1.1")
 
-    implementation(project(":gennaker-annotations"))
+    implementation(project(":libs:annotations"))
 
     testImplementation(libs.bundles.testing)
 

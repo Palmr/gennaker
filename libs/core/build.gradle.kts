@@ -3,12 +3,12 @@ plugins {
 }
 
 dependencies {
-    api(project(":gennaker-annotations"))
+    api(project(":libs:annotations"))
 
     testImplementation(libs.bundles.testing)
 
-    testAnnotationProcessor(project(":gennaker-annotation-processor"))
-    testImplementation(project(":gennaker-annotation-processor"))
+    testAnnotationProcessor(project(":libs:annotation-processor"))
+    testImplementation(project(":libs:annotation-processor"))
     api(libs.agrona)
 
     implementation(libs.aeron)

@@ -1,2 +1,7 @@
 rootProject.name = "gennaker"
-include("example", "gennaker-annotation-processor", "gennaker-annotations", "gennaker-core")
+include(
+    ":example",
+    ":libs:annotation-processor",
+    ":libs:annotations",
+    ":libs:core"
+)
