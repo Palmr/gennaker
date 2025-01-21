@@ -5,7 +5,7 @@
 plugins {
     `java-library`
     `checkstyle`
-    // id("com.github.spotbugs")
+    id("com.github.spotbugs")
 }
 
 checkstyle {
@@ -30,4 +30,8 @@ tasks.withType<JavaExec> {
 }
 tasks.withType<Test> {
     jvmArgs("--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED")
+}
+
+tasks.spotbugsTest {
+    enabled = false
 }

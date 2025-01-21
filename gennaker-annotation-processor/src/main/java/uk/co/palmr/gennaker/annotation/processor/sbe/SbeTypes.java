@@ -3,6 +3,7 @@ package uk.co.palmr.gennaker.annotation.processor.sbe;
 import javax.lang.model.element.VariableElement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SbeTypes {
     private static final Map<String, SbeType> BASE_SBE_TYPES = Map.of(
@@ -57,17 +58,28 @@ public class SbeTypes {
 
         @Override
         public int compareTo(final SbeType otherType) {
-            if (isVariableLength() && otherType.isVariableLength())
-            {
+            if (isVariableLength() && otherType.isVariableLength()) {
                 return 0;
-            }
-            else if (isVariableLength() && !otherType.isVariableLength())
-            {
+            } else if (isVariableLength() && !otherType.isVariableLength()) {
                 return 1;
-            }
-            else {
+            } else {
                 return -1;
             }
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            final SbeType sbeType1 = (SbeType) o;
+            return variableLength == sbeType1.variableLength && Objects.equals(sbeType, sbeType1.sbeType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sbeType, variableLength);
         }
     }
 }
