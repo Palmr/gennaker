@@ -22,9 +22,10 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/example" />
-            <option value="$PROJECT_DIR$/gennaker-annotation-processor" />
-            <option value="$PROJECT_DIR$/gennaker-annotations" />
-            <option value="$PROJECT_DIR$/gennaker-core" />
+            <option value="$PROJECT_DIR$/libs" />
+            <option value="$PROJECT_DIR$/libs/annotation-processor" />
+            <option value="$PROJECT_DIR$/libs/annotations" />
+            <option value="$PROJECT_DIR$/libs/core" />
           </set>
         </option>
       </GradleProjectSettings>
