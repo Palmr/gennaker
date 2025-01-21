@@ -5,7 +5,6 @@ import uk.co.palmr.gennaker.annotation.processor.proxy.JavaProxy;
 import uk.co.palmr.gennaker.annotation.processor.proxy.PublisherProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.proxy.SubscriberProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.sbe.AnnotationFilerOutputManager;
-import uk.co.palmr.gennaker.annotation.processor.sbe.SbeTypes;
 import uk.co.palmr.gennaker.annotation.processor.sbe.SbeXmlBuilder;
 import uk.co.palmr.gennaker.annotations.Topic;
 import uk.co.real_logic.sbe.SbeTool;
@@ -27,7 +26,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 import javax.tools.StandardLocation;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Set;
 
 import static uk.co.palmr.gennaker.annotations.Serialiser.SBE;
@@ -56,8 +55,7 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
                 final var interfaceName = interfaceElement.getSimpleName().toString();
                 final var packageName = packageElement.getQualifiedName().toString();
 
-                final var sbeTypes = new SbeTypes();
-                final var sbeXmlBuilder = new SbeXmlBuilder(packageName, interfaceName, sbeTypes);
+                final var sbeXmlBuilder = SbeXmlBuilder.newBuilder(packageName, interfaceName);
 
                 final var publisherProxyBuilder = new PublisherProxyBuilder(packageName, interfaceName, topicAnnotation.maxMessageSize());
                 final var subscriberProxyBuilder = new SubscriberProxyBuilder(packageName, interfaceName);
@@ -108,7 +106,8 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
     }
 
     private static void sbeStubGen(final String packageName, final ProcessingEnvironment processingEnv, final TypeElement interfaceElement, final String fileName) throws Exception {
-        final var outputDirName = Paths.get(fileName).getParent().getParent().toString();
+        final Path path = Path.of(fileName);
+        final var outputDirName = resolveOutputDirName(path);
         final var schema = parseSchema(fileName);
         final var ir = new IrGenerator().generate(schema, packageName);
 
@@ -116,7 +115,7 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
         System.setProperty("sbe.decode.unknown.enum.values", "true");
 
         final var outputManager = new AnnotationFilerOutputManager(outputDirName, ir.applicableNamespace(), processingEnv, interfaceElement);
-        boolean shouldSupportTypesPackageNames = Boolean.getBoolean("sbe.types.package.override");
+        final boolean shouldSupportTypesPackageNames = Boolean.getBoolean("sbe.types.package.override");
         JavaGenerator codecGenerator = new JavaGenerator(ir,
                 System.getProperty("sbe.java.encoding.buffer.type", SbeTool.JAVA_DEFAULT_ENCODING_BUFFER_TYPE),
                 System.getProperty("sbe.java.decoding.buffer.type", SbeTool.JAVA_DEFAULT_DECODING_BUFFER_TYPE),
@@ -127,5 +126,19 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
                 precedenceChecks(),
                 outputManager);
         codecGenerator.generate();
+    }
+
+    private static String resolveOutputDirName(final Path path) {
+        if (path == null) {
+            return ".";
+        }
+
+        final Path parentDir = path.getParent();
+        if (parentDir == null) {
+            return ".";
+        }
+
+        final Path theBetterParentDir = parentDir.getParent();
+        return theBetterParentDir == null ? parentDir.toString() : theBetterParentDir.toString();
     }
 }

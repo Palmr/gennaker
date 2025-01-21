@@ -7,20 +7,28 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SbeXmlBuilder {
+public final class SbeXmlBuilder {
     private final String packageName;
     private final String interfaceName;
     private final SbeTypes sbeTypes;
     private final List<ExecutableElement> methods = new ArrayList<>();
 
-    public SbeXmlBuilder(final String packageName, final String interfaceName, final SbeTypes sbeTypes) {
+    private SbeXmlBuilder(final String packageName, final String interfaceName, final SbeTypes sbeTypes) {
         this.packageName = packageName;
         this.interfaceName = interfaceName;
         this.sbeTypes = sbeTypes;
     }
 
+    public void addType(final String type, final String sbeType, final boolean variableLength) {
+        sbeTypes.addType(type, sbeType, variableLength);
+    }
+
     public void method(final ExecutableElement methodElement) {
         methods.add(methodElement);
+    }
+
+    public static SbeXmlBuilder newBuilder(final String packageName, final String interfaceName) {
+        return new SbeXmlBuilder(packageName, interfaceName, new SbeTypes());
     }
 
     private void writeMethods(final Writer writer) throws IOException {
