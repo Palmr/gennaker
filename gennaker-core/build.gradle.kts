@@ -1,16 +1,5 @@
 plugins {
-    id("java-library")
-    id("checkstyle")
-    id("idea")
-}
-
-checkstyle {
-    maxWarnings = 0
-    toolVersion = libs.versions.checkstyleVersion.get()
-}
-
-repositories {
-    mavenCentral()
+    id("java-conventions")
 }
 
 dependencies {
@@ -25,15 +14,4 @@ dependencies {
     implementation(libs.aeron)
     implementation(libs.slf4j)
     implementation(libs.logback)
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.withType<JavaExec> {
-    jvmArgs("--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED")
-}
-tasks.withType<Test> {
-    jvmArgs("--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED")
 }

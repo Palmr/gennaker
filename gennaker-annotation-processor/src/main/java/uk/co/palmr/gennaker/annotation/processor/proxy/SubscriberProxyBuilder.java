@@ -28,7 +28,7 @@ public class SubscriberProxyBuilder implements JavaProxy {
         writer.write("""
                 import org.agrona.DirectBuffer;
                 import uk.co.palmr.gennaker.MessageHandler;
-                
+
                 """);
         writer.write("public class ");
         writer.write(className);
