@@ -21,9 +21,9 @@ public class AeronTransport implements Transport {
     private final IdleStrategy idle = new SleepingIdleStrategy();
     private final MediaDriver mediaDriver;
     private final Aeron aeron;
-    private final Map<Class, Integer> streamIdByTopic = new IdentityHashMap<>();
-    private final Map<Class, Publication> publishersByTopic = new IdentityHashMap<>();
-    private final Map<Class, Subscription> subscribersByTopic = new IdentityHashMap<>();
+    private final Map<Class<?>, Integer> streamIdByTopic = new IdentityHashMap<>();
+    private final Map<Class<?>, Publication> publishersByTopic = new IdentityHashMap<>();
+    private final Map<Class<?>, Subscription> subscribersByTopic = new IdentityHashMap<>();
 
     public AeronTransport() {
         final var mediaDriverCtx = new MediaDriver.Context()
@@ -49,28 +49,25 @@ public class AeronTransport implements Transport {
 
     @Override
     public <T, I extends T> void subscribe(final Class<T> topicClass, final I impl) {
-        final AgentRunner subscriberRunner;
-        var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription(AERON_URI, getStreamId(tc)));
-
+        final var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription(AERON_URI, getStreamId(tc)));
         final var subscriberProxy = ClassHunter.getSubscriberProxy(topicClass, impl);
-
         final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> subscriberProxy.onMessage(buf, offset, len));
 
-        subscriberRunner = new AgentRunner(idle,
-                Throwable::printStackTrace, null, new Agent() {
+        record SubscriberAgent(Subscription sub, FragmentAssembler handler, String topicName) implements Agent {
             @Override
             public int doWork() {
-                sub.poll(fragmentAssembler, 100);
+                sub.poll(handler, 100);
                 return 0;
             }
 
             @Override
             public String roleName() {
-                return "Gennaker-subscriber: " + topicClass.getSimpleName();
+                return "Gennaker-subscriber: " + topicName;
             }
-        });
+        }
 
-        AgentRunner.startOnThread(subscriberRunner);
+        AgentRunner.startOnThread(new AgentRunner(idle, Throwable::printStackTrace, null,
+                new SubscriberAgent(sub, fragmentAssembler, topicClass.getSimpleName())));
     }
 
     @Override
@@ -81,7 +78,7 @@ public class AeronTransport implements Transport {
         CloseHelper.quietClose(mediaDriver);
     }
 
-    private Integer getStreamId(final Class topicClass) {
+    private Integer getStreamId(final Class<?> topicClass) {
         // TODO: This is a terrible idea. I apologise.
         return streamIdByTopic.computeIfAbsent(topicClass, Object::hashCode);
     }

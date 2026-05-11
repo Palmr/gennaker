@@ -3,7 +3,6 @@ package uk.co.palmr.gennaker.annotation.processor.sbe;
 import javax.lang.model.element.VariableElement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class SbeTypes {
     private static final Map<String, SbeType> BASE_SBE_TYPES = Map.of(
@@ -39,47 +38,16 @@ public class SbeTypes {
         return maybeCustomType;
     }
 
-    public static class SbeType implements Comparable<SbeType> {
-        private final String sbeType;
-        private final boolean variableLength;
-
-        public SbeType(final String sbeType, final boolean variableLength) {
-            this.sbeType = sbeType;
-            this.variableLength = variableLength;
-        }
-
-        public String getSbeType() {
-            return sbeType;
-        }
-
-        public boolean isVariableLength() {
-            return variableLength;
-        }
-
+    public record SbeType(String sbeType, boolean variableLength) implements Comparable<SbeType> {
         @Override
         public int compareTo(final SbeType otherType) {
-            if (isVariableLength() && otherType.isVariableLength()) {
+            if (variableLength && otherType.variableLength) {
                 return 0;
-            } else if (isVariableLength() && !otherType.isVariableLength()) {
+            } else if (variableLength && !otherType.variableLength) {
                 return 1;
             } else {
                 return -1;
             }
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            final SbeType sbeType1 = (SbeType) o;
-            return variableLength == sbeType1.variableLength && Objects.equals(sbeType, sbeType1.sbeType);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(sbeType, variableLength);
         }
     }
 }

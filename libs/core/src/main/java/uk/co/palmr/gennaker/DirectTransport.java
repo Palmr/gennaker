@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DirectTransport implements Transport {
-    @SuppressWarnings("rawtypes")
-    private final Map<Class, List<Object>> subscribersByTopic = new IdentityHashMap<>();
+    private final Map<Class<?>, List<Object>> subscribersByTopic = new IdentityHashMap<>();
 
     @SuppressWarnings("unchecked")
     @Override

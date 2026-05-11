@@ -54,7 +54,7 @@ public final class SbeXmlBuilder {
             for (var paramIdx = 0; paramIdx < parameters.size(); paramIdx++) {
                 final var param = parameters.get(paramIdx);
                 final var sbeType = sbeTypes.getSbeType(param);
-                if (sbeType.isVariableLength()) {
+                if (sbeType.variableLength()) {
                     writer.write("        <data name=\"");
                 }
                 else {
@@ -64,7 +64,7 @@ public final class SbeXmlBuilder {
                 writer.write("\" id=\"");
                 writer.write(Integer.toString(paramIdx));
                 writer.write("\" type=\"");
-                writer.write(sbeType.getSbeType());
+                writer.write(sbeType.sbeType());
                 writer.write("\"/>\n");
             }
 

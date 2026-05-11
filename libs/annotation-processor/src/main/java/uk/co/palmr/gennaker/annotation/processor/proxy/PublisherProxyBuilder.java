@@ -69,7 +69,7 @@ public class PublisherProxyBuilder implements JavaProxy {
             final var methodName = methodElement.getSimpleName().toString();
             writer.write("    @Override\n");
             writer.write("    public ");
-            writer.write(String.valueOf(methodElement.getReturnType()));
+            writer.write(methodElement.getReturnType().toString());
             writer.write(" ");
             writer.write(methodName);
             writer.write("(");
