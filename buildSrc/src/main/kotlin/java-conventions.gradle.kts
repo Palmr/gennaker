@@ -35,3 +35,9 @@ tasks.withType<Test> {
 tasks.spotbugsTest {
     enabled = false
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
