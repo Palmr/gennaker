@@ -5,6 +5,7 @@ import uk.co.palmr.gennaker.annotation.processor.proxy.JavaProxy;
 import uk.co.palmr.gennaker.annotation.processor.proxy.PublisherProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.proxy.SubscriberProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.sbe.AnnotationFilerOutputManager;
+import uk.co.palmr.gennaker.annotation.processor.sbe.SbeCodecBodyEmitter;
 import uk.co.palmr.gennaker.annotation.processor.sbe.SbeXmlBuilder;
 import uk.co.palmr.gennaker.annotations.Codecs;
 import uk.co.palmr.gennaker.annotations.Topic;
@@ -55,20 +56,21 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
                 final var interfaceName = interfaceElement.getSimpleName().toString();
                 final var packageName = packageElement.getQualifiedName().toString();
 
-                final var sbeXmlBuilder = SbeXmlBuilder.newBuilder(packageName, interfaceName);
-
-                final var publisherProxyBuilder = new PublisherProxyBuilder(packageName, interfaceName, topicAnnotation.maxMessageSize());
-                final var subscriberProxyBuilder = new SubscriberProxyBuilder(packageName, interfaceName);
-
-                for (final var methodElement : ElementFilter.methodsIn(topicElement.getEnclosedElements())) {
+                final var methods = ElementFilter.methodsIn(topicElement.getEnclosedElements());
+                for (final var methodElement : methods) {
                     if (methodElement.getReturnType().getKind() != TypeKind.VOID) {
                         throw new UnsupportedOperationException("Only void methods supported for now");
                     }
-
-                    sbeXmlBuilder.method(methodElement);
-                    publisherProxyBuilder.method(methodElement);
-                    subscriberProxyBuilder.method(methodElement);
                 }
+
+                final var sbeXmlBuilder = SbeXmlBuilder.newBuilder(packageName, interfaceName);
+                for (final var methodElement : methods) {
+                    sbeXmlBuilder.method(methodElement);
+                }
+
+                final var emitter = new SbeCodecBodyEmitter(interfaceName, topicAnnotation.maxMessageSize(), methods);
+                final var publisherProxyBuilder = new PublisherProxyBuilder(packageName, interfaceName, methods, emitter);
+                final var subscriberProxyBuilder = new SubscriberProxyBuilder(packageName, interfaceName, emitter);
 
                 writeAndGenerateSbe(packageName, interfaceName, sbeXmlBuilder, interfaceElement, messager);
 
