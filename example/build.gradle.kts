@@ -10,6 +10,7 @@ spotbugs {
 
 dependencies {
     annotationProcessor(project(":libs:annotation-processor"))
+    annotationProcessor(project(":libs:message-codec-sbe"))
     implementation(project(":libs:annotation-processor"))
 
     implementation(project(":libs:annotations"))

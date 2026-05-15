@@ -12,5 +12,6 @@ dependencies {
 
     implementation(project(":libs:annotations"))
 
-    testImplementation(libs.bundles.testing)
+    implementation(libs.sbe)
+    implementation(libs.agrona)
 }

@@ -1,4 +1,4 @@
-package uk.co.palmr.gennaker.annotation.processor.sbe;
+package uk.co.palmr.gennaker.codec.sbe;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
