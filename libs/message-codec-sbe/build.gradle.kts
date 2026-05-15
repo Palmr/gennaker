@@ -15,4 +15,8 @@ dependencies {
 
     implementation(libs.sbe)
     implementation(libs.agrona)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.compileTesting)
+    testImplementation(project(":libs:annotation-processor"))
 }

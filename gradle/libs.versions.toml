@@ -6,6 +6,7 @@ sbeVersion = "1.35.3"
 agronaVersion = "2.2.2"
 slf4jVersion = "2.0.17"
 logbackVersion = "1.5.18"
+compileTestingVersion = "0.21.0"
 
 [libraries]
 aeron = { group = "io.aeron", name = "aeron-all", version.ref = "aeronVersion" }
@@ -16,6 +17,7 @@ jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.
 jupiterPlatform = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junitPlatformVersion" }
 slf4j = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logbackVersion" }
+compileTesting = { group = "com.google.testing.compile", name = "compile-testing", version.ref = "compileTestingVersion" }
 
 
 [bundles]

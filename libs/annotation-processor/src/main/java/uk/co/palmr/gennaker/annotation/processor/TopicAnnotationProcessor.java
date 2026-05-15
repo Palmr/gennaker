@@ -74,10 +74,16 @@ public class TopicAnnotationProcessor extends AbstractProcessor {
             final var packageName = packageElement.getQualifiedName().toString();
 
             final var methods = ElementFilter.methodsIn(topicElement.getEnclosedElements());
+            var hasInvalidMethod = false;
             for (final var methodElement : methods) {
                 if (methodElement.getReturnType().getKind() != TypeKind.VOID) {
-                    throw new UnsupportedOperationException("Only void methods supported for now");
+                    messager.printMessage(Diagnostic.Kind.ERROR,
+                            "Only void methods supported for now", methodElement);
+                    hasInvalidMethod = true;
                 }
+            }
+            if (hasInvalidMethod) {
+                continue;
             }
 
             final var context = new TopicContextImpl(processingEnv, interfaceElement, packageName, interfaceName,

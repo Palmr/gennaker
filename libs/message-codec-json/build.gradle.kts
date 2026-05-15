@@ -12,4 +12,6 @@ dependencies {
 
     implementation(project(":libs:annotations"))
     implementation(project(":libs:codec-spi"))
+
+    testImplementation(libs.bundles.testing)
 }
