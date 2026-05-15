@@ -26,6 +26,8 @@
             <option value="$PROJECT_DIR$/libs/annotation-processor" />
             <option value="$PROJECT_DIR$/libs/annotations" />
             <option value="$PROJECT_DIR$/libs/core" />
+            <option value="$PROJECT_DIR$/libs/message-codec-json" />
+            <option value="$PROJECT_DIR$/libs/message-codec-sbe" />
           </set>
         </option>
       </GradleProjectSettings>
