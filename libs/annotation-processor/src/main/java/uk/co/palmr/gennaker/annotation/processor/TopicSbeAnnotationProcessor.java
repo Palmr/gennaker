@@ -6,6 +6,7 @@ import uk.co.palmr.gennaker.annotation.processor.proxy.PublisherProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.proxy.SubscriberProxyBuilder;
 import uk.co.palmr.gennaker.annotation.processor.sbe.AnnotationFilerOutputManager;
 import uk.co.palmr.gennaker.annotation.processor.sbe.SbeXmlBuilder;
+import uk.co.palmr.gennaker.annotations.Codecs;
 import uk.co.palmr.gennaker.annotations.Topic;
 import uk.co.real_logic.sbe.SbeTool;
 import uk.co.real_logic.sbe.generation.java.JavaGenerator;
@@ -29,7 +30,6 @@ import javax.tools.StandardLocation;
 import java.nio.file.Path;
 import java.util.Set;
 
-import static uk.co.palmr.gennaker.annotations.Serialiser.SBE;
 import static uk.co.real_logic.sbe.SbeTool.parseSchema;
 import static uk.co.real_logic.sbe.generation.TargetCodeGeneratorLoader.precedenceChecks;
 
@@ -49,7 +49,7 @@ public class TopicSbeAnnotationProcessor extends AbstractProcessor {
             }
 
             final var topicAnnotation = topicElement.getAnnotation(Topic.class);
-            if (topicAnnotation.serialiser() == SBE) {
+            if (Codecs.SBE.equals(topicAnnotation.messageCodec())) {
                 final var interfaceElement = (TypeElement) topicElement;
                 final var packageElement = processingEnv.getElementUtils().getPackageOf(interfaceElement);
                 final var interfaceName = interfaceElement.getSimpleName().toString();

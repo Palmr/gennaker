@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Topic {
     int maxMessageSize() default 1024;
-    Serialiser serialiser() default Serialiser.SBE;
+    String messageCodec() default Codecs.SBE;
 }
