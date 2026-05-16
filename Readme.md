@@ -7,10 +7,13 @@ configurable transport. No hand-rolled encoders, no manual dispatch, no glue.
 ## At a glance
 
 ```java
+public record PingPayload(int seqNum, String text) {}
+
 @Topic
 public interface Ping {
     void doPing(String message);
     void doRepeat(int count, String message);
+    void doRich(PingPayload payload);   // record parameters supported
 }
 ```
 
@@ -72,7 +75,7 @@ Selected per-topic:
 public interface Pong { void doPong(String message); }
 ```
 
-Both supported parameter sets are currently primitives + `String`.
+Supported parameter types: primitives, `String`, Java records (auto-derived layout), and `List`-of-record fields. Non-record types can supply a `@LayoutSpec`-annotated `Layout<T>` implementation.
 
 ## Transports
 
@@ -92,7 +95,7 @@ Generating publishers and subscribers from a Java interface works. The actual
 API isn't very fleshed out yet.
 
 - Only `void` methods (no return values / RPC yet).
-- Parameters limited to primitives + `String`.
+- Parameters limited to primitives, `String`, records, and `List`-of-record. `Map` and nullable types not yet supported.
 - Transport choice is hard-coded by the application, not derived from the
   topic.
 - Backpressure handling is a `TODO` in the generated publisher.
@@ -102,7 +105,11 @@ API isn't very fleshed out yet.
 **API surface**
 
 - [ ] RPC: interface methods that return values
-- [ ] Richer parameter types: arbitrary records, collections, nullables
+- [x] Arbitrary records as method parameters (auto-derived from record components)
+- [x] `@LayoutSpec` / `Layout<T>` for non-record custom types
+- [x] `List`-of-record fields
+- [ ] `Map` field type
+- [ ] Nullable types
 - [ ] User-supplied custom serialisers for specific types
 
 **Transports**
