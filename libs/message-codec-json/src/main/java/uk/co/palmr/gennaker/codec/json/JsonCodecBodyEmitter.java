@@ -1,10 +1,12 @@
 package uk.co.palmr.gennaker.codec.json;
 
 import uk.co.palmr.gennaker.codec.CodecBodyEmitter;
+import uk.co.palmr.gennaker.codec.TypeShape;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Emits JSON-flavoured publisher and subscriber proxy bodies.
@@ -17,13 +19,16 @@ public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
     private final String interfaceName;
     private final int maxMessageSize;
     private final List<ExecutableElement> methods;
+    private final Map<String, TypeShape> reachableTypes;
 
     public JsonCodecBodyEmitter(final String interfaceName,
                                 final int maxMessageSize,
-                                final List<ExecutableElement> methods) {
+                                final List<ExecutableElement> methods,
+                                final Map<String, TypeShape> reachableTypes) {
         this.interfaceName = interfaceName;
         this.maxMessageSize = maxMessageSize;
         this.methods = List.copyOf(methods);
+        this.reachableTypes = Map.copyOf(reachableTypes);
     }
 
     @Override
@@ -70,14 +75,20 @@ public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
         return sb.toString();
     }
 
-    private static String appendParam(final VariableElement param) {
+    private String appendParam(final VariableElement param) {
         final var name = param.getSimpleName().toString();
         final var type = param.asType().toString();
         return switch (type) {
             case "java.lang.String" -> "        JsonWriter.writeString(" + name + ", json);\n";
             case "char" -> "        JsonWriter.writeChar(" + name + ", json);\n";
             case "byte", "short" -> "        json.append((int) " + name + ");\n";
-            default -> "        json.append(" + name + ");\n";
+            default -> {
+                if (reachableTypes.containsKey(type)) {
+                    final var simple = simpleNameOf(type);
+                    yield "        " + simple + "__layout.encode(" + name + ", json);\n";
+                }
+                yield "        json.append(" + name + ");\n";
+            }
         };
     }
 
@@ -120,8 +131,9 @@ public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
                     sb.append("                reader.expectComma();\n");
                 }
                 final var p = params.get(i);
-                sb.append("                final ").append(p.asType()).append(' ').append(p.getSimpleName())
-                        .append(" = reader.").append(readerCall(p.asType().toString())).append(";\n");
+                final var paramType = p.asType().toString();
+                sb.append("                final ").append(paramType).append(' ').append(p.getSimpleName());
+                sb.append(" = ").append(decodeExpression(paramType)).append(";\n");
             }
             sb.append("                reader.expectArrayEnd();\n");
             sb.append("                reader.expectObjectEnd();\n");
@@ -140,6 +152,13 @@ public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
         return sb.toString();
     }
 
+    private String decodeExpression(final String type) {
+        if (reachableTypes.containsKey(type)) {
+            return simpleNameOf(type) + "__layout.decode(reader)";
+        }
+        return "reader." + readerCall(type);
+    }
+
     private static String readerCall(final String type) {
         return switch (type) {
             case "java.lang.String" -> "readString()";
@@ -153,5 +172,10 @@ public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
             case "double" -> "readDouble()";
             default -> throw new IllegalArgumentException("Unsupported JSON parameter type: " + type);
         };
+    }
+
+    private static String simpleNameOf(final String fqn) {
+        final var dot = fqn.lastIndexOf('.');
+        return (dot >= 0) ? fqn.substring(dot + 1) : fqn;
     }
 }

@@ -8,6 +8,8 @@ import uk.co.palmr.gennaker.annotations.Topic;
 import uk.co.palmr.gennaker.codec.CodecBodyEmitter;
 import uk.co.palmr.gennaker.codec.MessageCodecGenerator;
 import uk.co.palmr.gennaker.codec.TopicContext;
+import uk.co.palmr.gennaker.codec.TypeShape;
+import uk.co.palmr.gennaker.annotation.processor.shape.ShapeExtractor;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
@@ -49,6 +51,8 @@ public class TopicAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(final Set<? extends TypeElement> set, final RoundEnvironment roundEnvironment) {
         final var messager = processingEnv.getMessager();
+        final var shapeExtractor = new ShapeExtractor(processingEnv);
+        shapeExtractor.discoverLayouts(roundEnvironment);
 
         for (final Element topicElement : roundEnvironment.getElementsAnnotatedWith(Topic.class)) {
             if (topicElement.getKind() != ElementKind.INTERFACE) {
@@ -86,8 +90,9 @@ public class TopicAnnotationProcessor extends AbstractProcessor {
                 continue;
             }
 
+            final var reachableTypes = shapeExtractor.collectReachableTypes(methods);
             final var context = new TopicContextImpl(processingEnv, interfaceElement, packageName, interfaceName,
-                    topicAnnotation.maxMessageSize(), methods);
+                    topicAnnotation.maxMessageSize(), methods, reachableTypes);
             final CodecBodyEmitter emitter = codec.generate(context);
 
             final var publisherProxyBuilder = new PublisherProxyBuilder(packageName, interfaceName, methods, emitter);
@@ -116,9 +121,11 @@ public class TopicAnnotationProcessor extends AbstractProcessor {
                                     String packageName,
                                     String interfaceName,
                                     int maxMessageSize,
-                                    List<ExecutableElement> methods) implements TopicContext {
+                                    List<ExecutableElement> methods,
+                                    Map<String, TypeShape> reachableTypes) implements TopicContext {
         private TopicContextImpl {
             methods = List.copyOf(methods);
+            reachableTypes = Map.copyOf(reachableTypes);
         }
     }
 }

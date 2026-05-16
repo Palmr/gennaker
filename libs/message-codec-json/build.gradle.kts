@@ -14,4 +14,7 @@ dependencies {
     implementation(project(":libs:codec-spi"))
 
     testImplementation(libs.bundles.testing)
+    testImplementation(libs.agrona)
+    testImplementation(project(":libs:annotation-processor"))
+    testImplementation(project(":libs:layout-api"))
 }

@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/libs/annotations" />
             <option value="$PROJECT_DIR$/libs/codec-spi" />
             <option value="$PROJECT_DIR$/libs/core" />
+            <option value="$PROJECT_DIR$/libs/layout-api" />
             <option value="$PROJECT_DIR$/libs/message-codec-json" />
             <option value="$PROJECT_DIR$/libs/message-codec-sbe" />
           </set>

@@ -4,6 +4,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Per-topic context handed to a {@link MessageCodecGenerator} so it can read
@@ -22,4 +23,12 @@ public interface TopicContext {
     int maxMessageSize();
 
     List<ExecutableElement> methods();
+
+    /**
+     * All Layout-described types reachable (transitively) from this topic's
+     * method parameters. Keyed by fully-qualified Java type name.
+     *
+     * <p>Empty when the topic uses only primitives and {@link String}.
+     */
+    Map<String, TypeShape> reachableTypes();
 }

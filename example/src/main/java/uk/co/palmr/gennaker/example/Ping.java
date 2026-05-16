@@ -8,4 +8,6 @@ public interface Ping {
     void doPing(String message);
 
     void doRepeat(int count, String message);
+
+    void doRich(PingPayload payload);
 }

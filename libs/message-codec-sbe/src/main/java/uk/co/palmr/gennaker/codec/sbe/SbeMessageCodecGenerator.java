@@ -28,13 +28,15 @@ public class SbeMessageCodecGenerator implements MessageCodecGenerator {
     @Override
     public CodecBodyEmitter generate(final TopicContext context) {
         final var sbeXmlBuilder = SbeXmlBuilder.newBuilder(context.packageName(), context.interfaceName());
+        sbeXmlBuilder.setReachableTypes(context.reachableTypes());
         for (final var method : context.methods()) {
             sbeXmlBuilder.method(method);
         }
 
         writeAndGenerateSbe(context, sbeXmlBuilder);
 
-        return new SbeCodecBodyEmitter(context.interfaceName(), context.maxMessageSize(), context.methods());
+        return new SbeCodecBodyEmitter(
+                context.interfaceName(), context.maxMessageSize(), context.methods(), context.reachableTypes());
     }
 
     private void writeAndGenerateSbe(final TopicContext context, final SbeXmlBuilder sbeXmlBuilder) {

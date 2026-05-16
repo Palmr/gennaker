@@ -149,6 +149,69 @@ public final class JsonReader {
         return s.charAt(0);
     }
 
+    /**
+     * Read a JSON object field name (the key before the colon).
+     * Reads a quoted string and consumes the following colon.
+     */
+    public String readFieldName() {
+        final String name = readString();
+        skipWs();
+        require(':');
+        return name;
+    }
+
+    /**
+     * Try to consume {@code ']'}. Returns true if found, false otherwise.
+     */
+    public boolean tryArrayEnd() {
+        skipWs();
+        if (pos < src.length() && src.charAt(pos) == ']') {
+            pos++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Try to consume {@code '}'}. Returns true if found, false otherwise.
+     */
+    public boolean tryObjectEnd() {
+        skipWs();
+        if (pos < src.length() && src.charAt(pos) == '}') {
+            pos++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Consumes a comma and returns false, or consumes {@code ']'} and returns
+     * true. Used when iterating array elements.
+     */
+    public boolean tryCommaOrArrayEnd() {
+        skipWs();
+        if (pos < src.length() && src.charAt(pos) == ']') {
+            pos++;
+            return true;
+        }
+        require(',');
+        return false;
+    }
+
+    /**
+     * Consumes a comma and returns false, or consumes {@code '}'} and returns
+     * true. Used when iterating map entries.
+     */
+    public boolean tryCommaOrObjectEnd() {
+        skipWs();
+        if (pos < src.length() && src.charAt(pos) == '}') {
+            pos++;
+            return true;
+        }
+        require(',');
+        return false;
+    }
+
     private void skipWs() {
         while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
             pos++;

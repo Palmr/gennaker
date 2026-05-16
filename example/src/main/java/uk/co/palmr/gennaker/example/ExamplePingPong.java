@@ -19,11 +19,13 @@ public class ExamplePingPong {
         gennaker.subscribe(Pong.class, new PongHandler());
         gennaker.subscribe(Ping.class, new PingHandler(pongPublisher));
 
-        System.out.println("Sending a doPing & doRepeat every 3 seconds...");
+        System.out.println("Sending a doPing, doRepeat & doRich every 3 seconds...");
+        var seq = 0;
         while (!Thread.interrupted()) {
             final var now = Instant.now().atZone(UTC);
             pingPublisher.doPing("Ping @ " + now);
             pingPublisher.doRepeat(now.getSecond(), "Repeat Me! ");
+            pingPublisher.doRich(new PingPayload(seq++, "rich @ " + now));
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
         }
 
@@ -48,6 +50,12 @@ public class ExamplePingPong {
         @Override
         public void doRepeat(final int count, final String message) {
             System.out.println("Doing Repeat: " + message.repeat(count));
+        }
+
+        @Override
+        public void doRich(final PingPayload payload) {
+            System.out.println("Received Rich[" + payload.seqNum() + "]: " + payload.text());
+            pongPublisher.doPong("Pong: " + payload.text());
         }
     }
 
