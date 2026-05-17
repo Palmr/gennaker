@@ -1,5 +1,4 @@
 # Gennaker
-## Ergonomic messaging for Java
 
 Annotate an interface, get a typed publisher and subscriber wired to a 
 configurable transport. No hand-rolled encoders, no manual dispatch, no glue.
@@ -116,7 +115,6 @@ API isn't very fleshed out yet.
 
 **Transports**
 
-- [ ] Annotation-driven transport selection
 - [ ] Batching / transactional sends
 - [ ] Backpressure: configurable block-vs-drop when the queue is full
 - [ ] Reliability levels (at-most-once / at-least-once)
