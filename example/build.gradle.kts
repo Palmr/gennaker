@@ -34,4 +34,5 @@ dependencies {
     implementation(project(":libs:annotations"))
     implementation(project(":libs:core"))
     implementation(project(":libs:message-codec-json"))
+    implementation(project(":libs:transport-aeron"))
 }

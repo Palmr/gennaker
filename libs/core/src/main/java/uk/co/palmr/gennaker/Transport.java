@@ -22,14 +22,16 @@ public interface Transport {
     <T, I extends T> boolean publish(Class<T> topicClazz, DirectBuffer message, int limit);
 
     /**
-     * Registers a topic implementation to receive decoded inbound messages.
+     * Registers a message handler to receive raw inbound messages on a topic.
+     * The handler is typically the generated subscriber proxy, which decodes
+     * the bytes and dispatches to user code. Proxy resolution is done by
+     * {@link Gennaker#subscribe} before this method is called — transports
+     * never need to know about codec proxies themselves.
      *
-     * @param topicClazz the topic interface
-     * @param impl       user implementation invoked by the generated subscriber proxy
-     * @param <T>        the topic interface type
-     * @param <I>        the concrete implementation type
+     * @param topicClazz the topic interface (used as a routing key)
+     * @param handler    receives encoded messages as they arrive
      */
-    <T, I extends T> void subscribe(Class<T> topicClazz, I impl);
+    void subscribe(Class<?> topicClazz, MessageHandler handler);
 
     /** Releases any resources held by this transport. */
     void shutdown();

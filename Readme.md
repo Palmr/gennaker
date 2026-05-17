@@ -49,17 +49,19 @@ it.
 ## Modules
 
 ```
-:libs:core                 # runtime: Gennaker entry point, DirectTransport, AeronTransport
+:libs:core                 # runtime: Gennaker entry point, Transport SPI, DirectTransport
 :libs:annotations          # @Topic and Codecs constants, the only module users see
 :libs:annotation-processor # discovers codecs, generates proxy shells
 :libs:codec-spi            # MessageCodecGenerator / CodecBodyEmitter / TopicContext
 :libs:message-codec-sbe    # SBE codec (binary, schema-derived, fast)
 :libs:message-codec-json   # JSON codec (human-readable, easier debugging)
+:libs:transport-aeron      # AeronTransport (IPC / multi-process via embedded Aeron)
 :example                   # demo: heterogeneous SBE + JSON topics over Aeron
 ```
 
 A typical user depends on `:libs:annotations` and `:libs:core` plus whichever
-codec module(s) they want as `annotationProcessor`.
+codec module(s) they want as `annotationProcessor`, plus a transport module
+(`:libs:transport-aeron`) if they need anything beyond in-process delivery.
 
 ## Codecs
 
@@ -79,10 +81,10 @@ Supported parameter types: primitives, `String`, Java records (auto-derived layo
 
 ## Transports
 
-| Transport         | Use case                          |
-| ----------------- | --------------------------------- |
-| `DirectTransport` | In-process, synchronous dispatch  |
-| `AeronTransport`  | IPC / multi-process via Aeron     |
+| Transport         | Module                       | Use case                          |
+| ----------------- | ---------------------------- | --------------------------------- |
+| `DirectTransport` | `:libs:core`                 | In-process, synchronous dispatch  |
+| `AeronTransport`  | `:libs:transport-aeron`      | IPC / multi-process via Aeron     |
 
 Choice is currently constructor-driven; pushing the choice into the
 annotation is on the roadmap.
@@ -161,7 +163,7 @@ Bump the version in `build.gradle.kts` (remove `-SNAPSHOT`), then:
 ./gradlew publishAllPublicationsToCentralPortal
 ```
 
-Each module is uploaded as a separate deployment bundle. All seven should show as `VALIDATED` on the portal.
+Each module is uploaded as a separate deployment bundle. All should show as `VALIDATED` on the portal.
 
 **3. Publish**
 

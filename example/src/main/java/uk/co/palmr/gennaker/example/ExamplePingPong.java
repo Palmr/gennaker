@@ -1,7 +1,7 @@
 package uk.co.palmr.gennaker.example;
 
-import uk.co.palmr.gennaker.AeronTransport;
 import uk.co.palmr.gennaker.Gennaker;
+import uk.co.palmr.gennaker.transport.aeron.AeronTransport;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;

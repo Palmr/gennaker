@@ -7,5 +7,6 @@ include(
     ":libs:core",
     ":libs:layout-api",
     ":libs:message-codec-json",
-    ":libs:message-codec-sbe"
+    ":libs:message-codec-sbe",
+    ":libs:transport-aeron"
 )

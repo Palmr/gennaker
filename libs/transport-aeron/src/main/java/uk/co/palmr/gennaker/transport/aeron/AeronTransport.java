@@ -1,4 +1,4 @@
-package uk.co.palmr.gennaker;
+package uk.co.palmr.gennaker.transport.aeron;
 
 import io.aeron.Aeron;
 import io.aeron.FragmentAssembler;
@@ -12,6 +12,8 @@ import org.agrona.concurrent.Agent;
 import org.agrona.concurrent.AgentRunner;
 import org.agrona.concurrent.IdleStrategy;
 import org.agrona.concurrent.SleepingIdleStrategy;
+import uk.co.palmr.gennaker.MessageHandler;
+import uk.co.palmr.gennaker.Transport;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -59,10 +61,9 @@ public final class AeronTransport implements Transport {
     }
 
     @Override
-    public <T, I extends T> void subscribe(final Class<T> topicClass, final I impl) {
+    public void subscribe(final Class<?> topicClass, final MessageHandler handler) {
         final var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription(AERON_URI, getStreamId(tc)));
-        final var subscriberProxy = ClassHunter.getSubscriberProxy(topicClass, impl);
-        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> subscriberProxy.onMessage(buf, offset, len));
+        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> handler.onMessage(buf, offset, len));
 
         record SubscriberAgent(Subscription sub, FragmentAssembler handler, String topicName) implements Agent {
             @Override

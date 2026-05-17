@@ -34,7 +34,7 @@ public final class Gennaker {
      * @param <I>                a subtype of {@code T} implementing the topic
      */
     public <T, I extends T> void subscribe(final Class<T> topicClass, final I topicImplementation) {
-        transport.subscribe(topicClass, topicImplementation);
+        transport.subscribe(topicClass, ClassHunter.getSubscriberProxy(topicClass, topicImplementation));
     }
 
     /**
