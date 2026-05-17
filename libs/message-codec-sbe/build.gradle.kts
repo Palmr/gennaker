@@ -1,6 +1,9 @@
 plugins {
     id("java-conventions")
+    id("publishing-conventions")
 }
+
+description = "SBE codec for Gennaker — allocation-free binary wire format using Simple Binary Encoding"
 
 repositories {
     mavenCentral()

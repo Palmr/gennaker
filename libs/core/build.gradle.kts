@@ -1,6 +1,9 @@
 plugins {
     id("java-conventions")
+    id("publishing-conventions")
 }
+
+description = "Gennaker runtime — publisher and subscriber entry point, DirectTransport and AeronTransport"
 
 dependencies {
     api(project(":libs:annotations"))

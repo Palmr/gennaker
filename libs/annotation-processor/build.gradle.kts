@@ -1,6 +1,9 @@
 plugins {
     id("java-conventions")
+    id("publishing-conventions")
 }
+
+description = "Annotation processor that generates publisher and subscriber proxies for @Topic interfaces"
 
 repositories {
     mavenCentral()

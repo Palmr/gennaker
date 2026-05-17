@@ -142,3 +142,34 @@ API isn't very fleshed out yet.
 Requires JDK 21. The example uses Aeron, which needs
 `--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED` (already wired into
 the build).
+
+## Releasing to Maven Central
+
+**1. Prerequisites (one-time)**
+
+- Add credentials to `~/.gradle/gradle.properties`:
+
+```properties
+centralUsername=<token-username>
+centralPassword=<token-password>
+```
+
+**2. Cut a release**
+
+Bump the version in `build.gradle.kts` (remove `-SNAPSHOT`), then:
+
+```bash
+./gradlew publishAllPublicationsToCentralPortal
+```
+
+Each module is uploaded as a separate deployment bundle. All seven should show as `VALIDATED` on the portal.
+
+**3. Publish**
+
+Log into [central.sonatype.com](https://central.sonatype.com) → Deployments. Review the bundles, then click **Publish** on each. Artifacts appear on Maven Central within ~30 minutes.
+
+If anything looks wrong, click **Drop** instead — nothing will be published.
+
+**4. After release**
+
+Bump the version to the next `-SNAPSHOT` in `build.gradle.kts` and commit.

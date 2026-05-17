@@ -2,8 +2,10 @@ plugins {
     `idea`
 }
 
-group = "uk.co.palmr.gennaker"
-version = "1.0-SNAPSHOT"
+allprojects {
+    group = "uk.co.palmr.gennaker"
+    version = "1.0.0-SNAPSHOT"
+}
 
 idea {
     module {

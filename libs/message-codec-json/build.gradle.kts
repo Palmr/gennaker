@@ -1,6 +1,9 @@
 plugins {
     id("java-conventions")
+    id("publishing-conventions")
 }
+
+description = "JSON codec for Gennaker — human-readable wire format, zero external runtime dependencies"
 
 repositories {
     mavenCentral()
