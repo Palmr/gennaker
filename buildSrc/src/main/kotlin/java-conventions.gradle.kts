@@ -36,6 +36,10 @@ tasks.spotbugsTest {
     enabled = false
 }
 
+tasks.spotbugsMain {
+    excludeFilter = rootProject.layout.projectDirectory.file("config/spotbugs/exclude.xml").asFile
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)

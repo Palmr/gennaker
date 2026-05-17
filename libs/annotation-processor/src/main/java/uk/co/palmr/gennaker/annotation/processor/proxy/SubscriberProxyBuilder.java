@@ -28,30 +28,27 @@ public final class SubscriberProxyBuilder implements JavaProxy {
 
     @Override
     public void write(final Writer writer) throws IOException {
-        writer.write("package ");
-        writer.write(packageName);
-        writer.write(";\n\n");
+        writer.write("package %s;%n%n".formatted(packageName));
         writer.write(emitter.subscriberImports());
-        writer.write("public class ");
-        writer.write(className);
-        writer.write(" implements MessageHandler {\n");
-        writer.write("    private static final java.lang.System.Logger LOG = java.lang.System.getLogger(\"");
-        writer.write(packageName);
-        writer.write(".");
-        writer.write(interfaceName);
-        writer.write("\");\n\n");
-        writer.write(emitter.subscriberFields());
-        writer.write("    private final " + interfaceName + " delegate;\n\n");
-        writer.write("    public ");
-        writer.write(className);
-        writer.write("(final " + interfaceName + " delegate) {\n        this.delegate = delegate;\n    }\n\n");
+        writer.write("""
+                public class %s implements MessageHandler {
+                    private static final java.lang.System.Logger LOG = java.lang.System.getLogger("%s.%s");
 
-        writer.write("    public void onMessage(final DirectBuffer buffer, final int offset, final int length) {\n");
-        writer.write("        if (LOG.isLoggable(java.lang.System.Logger.Level.TRACE)) {\n");
-        writer.write("            LOG.log(java.lang.System.Logger.Level.TRACE, \"sub received \" + length + \" bytes\");\n");
-        writer.write("        }\n");
+                """.formatted(className, packageName, interfaceName));
+        writer.write(emitter.subscriberFields());
+        writer.write("""
+                    private final %s delegate;
+
+                    public %s(final %s delegate) {
+                        this.delegate = delegate;
+                    }
+
+                    public void onMessage(final DirectBuffer buffer, final int offset, final int length) {
+                        if (LOG.isLoggable(java.lang.System.Logger.Level.TRACE)) {
+                            LOG.log(java.lang.System.Logger.Level.TRACE, "sub received " + length + " bytes");
+                        }
+                """.formatted(interfaceName, className, interfaceName));
         writer.write(emitter.subscriberOnMessageBody());
-        writer.write("    }\n");
-        writer.write("}\n");
+        writer.write("    }\n}\n");
     }
 }

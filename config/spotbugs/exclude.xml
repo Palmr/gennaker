@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Project-wide SpotBugs exclusion filter.
+-->
+<FindBugsFilter>
+
+    <!--
+      The proxy builders intentionally emit `\n` (not %n) inside their format
+      strings because they are generating Java source code, where line endings
+      must be literal `\n` regardless of host platform. %n would produce CRLF
+      on Windows and break the generated source.
+    -->
+    <Match>
+        <Class name="~uk\.co\.palmr\.gennaker\.annotation\.processor\.proxy\..*ProxyBuilder"/>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+    </Match>
+</FindBugsFilter>

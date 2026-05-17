@@ -3,6 +3,7 @@ package uk.co.palmr.gennaker.annotation.processor.proxy;
 import uk.co.palmr.gennaker.codec.CodecBodyEmitter;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -34,58 +35,53 @@ public final class PublisherProxyBuilder implements JavaProxy {
 
     @Override
     public void write(final Writer writer) throws IOException {
-        writer.write("package ");
-        writer.write(packageName);
-        writer.write(";\n\n");
+        writer.write("package %s;%n%n".formatted(packageName));
         writer.write(emitter.publisherImports());
-        writer.write("public class ");
-        writer.write(className);
-        writer.write(" implements ");
-        writer.write(interfaceName);
-        writer.write(" {\n");
-        writer.write("    private static final java.lang.System.Logger LOG = java.lang.System.getLogger(\"");
-        writer.write(packageName);
-        writer.write(".");
-        writer.write(interfaceName);
-        writer.write("\");\n\n");
+        writer.write("""
+                public class %s implements %s {
+                    private static final java.lang.System.Logger LOG = java.lang.System.getLogger("%s.%s");
+
+                """.formatted(className, interfaceName, packageName, interfaceName));
         writer.write(emitter.publisherFields());
-        writer.write("    private final Transport transport;\n\n");
-        writer.write("    public ");
-        writer.write(className);
-        writer.write("(final Transport transport) {\n        this.transport = transport;\n    }\n\n");
+        writer.write("""
+                    private final Transport transport;
+
+                    public %s(final Transport transport) {
+                        this.transport = transport;
+                    }
+
+                """.formatted(className));
 
         for (final ExecutableElement methodElement : methods) {
-            final var methodName = methodElement.getSimpleName().toString();
-            writer.write("    @Override\n");
-            writer.write("    public ");
-            writer.write(methodElement.getReturnType().toString());
-            writer.write(" ");
-            writer.write(methodName);
-            writer.write("(");
-            writer.write(methodElement.getParameters().stream()
-                    .map(p -> p.asType() + " " + p.getSimpleName())
-                    .collect(Collectors.joining(", ")));
-            writer.write(") {\n");
-            writer.write("        if (LOG.isLoggable(java.lang.System.Logger.Level.TRACE)) {\n");
-            writer.write("            LOG.log(java.lang.System.Logger.Level.TRACE, \"pub ");
-            writer.write(methodName);
-            writer.write("(\"");
-            final var params = methodElement.getParameters();
-            for (int i = 0; i < params.size(); i++) {
-                writer.write(" + ");
-                if (i > 0) {
-                    writer.write("\", \" + ");
-                }
-                writer.write("java.lang.String.valueOf(");
-                writer.write(params.get(i).getSimpleName().toString());
-                writer.write(")");
-            }
-            writer.write(" + \")\");\n");
-            writer.write("        }\n");
+            writer.write(methodHeader(methodElement));
+            writer.write(traceLog(methodElement));
             writer.write(emitter.publisherMethodBody(methodElement));
-            writer.write("    }\n\n");
+            writer.write("    }%n%n".formatted());
         }
 
         writer.write("}\n");
+    }
+
+    private static String methodHeader(final ExecutableElement method) {
+        final var params = method.getParameters().stream()
+                .map(p -> p.asType() + " " + p.getSimpleName())
+                .collect(Collectors.joining(", "));
+        return """
+                    @Override
+                    public %s %s(%s) {
+                """.formatted(method.getReturnType(), method.getSimpleName(), params);
+    }
+
+    private static String traceLog(final ExecutableElement method) {
+        final var args = method.getParameters().stream()
+                .map(VariableElement::getSimpleName)
+                .map(name -> "java.lang.String.valueOf(" + name + ")")
+                .collect(Collectors.joining(" + \", \" + "));
+        final var argsExpr = args.isEmpty() ? "\"\"" : args;
+        return """
+                        if (LOG.isLoggable(java.lang.System.Logger.Level.TRACE)) {
+                            LOG.log(java.lang.System.Logger.Level.TRACE, "pub %s(" + %s + ")");
+                        }
+                """.formatted(method.getSimpleName(), argsExpr);
     }
 }

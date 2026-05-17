@@ -145,6 +145,7 @@ API isn't very fleshed out yet.
 - [ ] A richer example showing multi-process operation over Aeron
 - [ ] Publish to Maven Central
 - [ ] Document the SPI for third-party codec authors
+- [ ] Rewrite proxy and codec code-gen using JavaPoet (type-safe builders, managed imports)
 
 ## Building
 
