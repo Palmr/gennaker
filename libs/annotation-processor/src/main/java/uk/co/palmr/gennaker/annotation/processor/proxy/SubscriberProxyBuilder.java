@@ -35,6 +35,11 @@ public final class SubscriberProxyBuilder implements JavaProxy {
         writer.write("public class ");
         writer.write(className);
         writer.write(" implements MessageHandler {\n");
+        writer.write("    private static final java.lang.System.Logger LOG = java.lang.System.getLogger(\"");
+        writer.write(packageName);
+        writer.write(".");
+        writer.write(interfaceName);
+        writer.write("\");\n\n");
         writer.write(emitter.subscriberFields());
         writer.write("    private final " + interfaceName + " delegate;\n\n");
         writer.write("    public ");
@@ -42,6 +47,9 @@ public final class SubscriberProxyBuilder implements JavaProxy {
         writer.write("(final " + interfaceName + " delegate) {\n        this.delegate = delegate;\n    }\n\n");
 
         writer.write("    public void onMessage(final DirectBuffer buffer, final int offset, final int length) {\n");
+        writer.write("        if (LOG.isLoggable(java.lang.System.Logger.Level.TRACE)) {\n");
+        writer.write("            LOG.log(java.lang.System.Logger.Level.TRACE, \"sub received \" + length + \" bytes\");\n");
+        writer.write("        }\n");
         writer.write(emitter.subscriberOnMessageBody());
         writer.write("    }\n");
         writer.write("}\n");

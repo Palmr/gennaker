@@ -88,6 +88,20 @@ Supported parameter types: primitives, `String`, Java records (auto-derived layo
 Choice is currently constructor-driven; pushing the choice into the
 annotation is on the roadmap.
 
+## Logging
+
+Gennaker uses `java.lang.System.Logger` (JEP 264) — zero runtime dependencies, and the consumer picks the binding. Defaults to JUL if no `LoggerFinder` SPI is on the classpath; add `logback-classic`, `log4j-slf4j2-impl`, `slf4j-simple`, etc. as your `runtimeOnly` dependency to route gennaker's logs through your stack.
+
+Useful logger names:
+
+| Logger                                       | Level | What it shows                                  |
+| -------------------------------------------- | ----- | ---------------------------------------------- |
+| `uk.co.palmr.gennaker.Gennaker`              | INFO  | publisher/subscriber wiring                    |
+| `uk.co.palmr.gennaker.transport.aeron.AeronTransport` | DEBUG | per-topic Aeron stream setup           |
+| *your topic interface FQN* (e.g. `com.example.Ping`) | TRACE | every published / received call per topic |
+
+The example wires up `logback-classic` and ships a `logback.xml` showing how to set these levels.
+
 ## Status
 
 A working proof-of-concept, used end-to-end in the `example/` module.

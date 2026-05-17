@@ -12,6 +12,8 @@ package uk.co.palmr.gennaker;
  * </pre>
  */
 public final class Gennaker {
+    private static final System.Logger LOG = System.getLogger(Gennaker.class.getName());
+
     private final Transport transport;
 
     /**
@@ -34,6 +36,8 @@ public final class Gennaker {
      * @param <I>                a subtype of {@code T} implementing the topic
      */
     public <T, I extends T> void subscribe(final Class<T> topicClass, final I topicImplementation) {
+        LOG.log(System.Logger.Level.INFO, "subscribed {0} -> {1}",
+                topicClass.getName(), topicImplementation.getClass().getName());
         transport.subscribe(topicClass, ClassHunter.getSubscriberProxy(topicClass, topicImplementation));
     }
 
@@ -47,6 +51,7 @@ public final class Gennaker {
      * @return a publisher proxy implementing {@code topicClass}
      */
     public <T> T publisher(final Class<T> topicClass) {
+        LOG.log(System.Logger.Level.INFO, "created publisher for {0}", topicClass.getName());
         return ClassHunter.getPublisherProxy(topicClass, transport);
     }
 

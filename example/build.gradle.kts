@@ -35,4 +35,9 @@ dependencies {
     implementation(project(":libs:core"))
     implementation(project(":libs:message-codec-json"))
     implementation(project(":libs:transport-aeron"))
+
+    // Library code logs via System.Logger. Pick a runtime binding here so the
+    // example actually shows logs; consumers of gennaker pick whichever binding
+    // they like.
+    runtimeOnly(libs.logback)
 }

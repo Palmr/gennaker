@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Demo logback config for the example. System.Logger calls from gennaker
+  (and any other library on the classpath that goes through SLF4J) are
+  routed here at runtime.
+
+  Useful levels to try:
+    - uk.co.palmr.gennaker        INFO  : publisher/subscriber wiring
+    - uk.co.palmr.gennaker.transport.aeron  DEBUG : per-topic stream setup
+    - <your topic interface FQN>  TRACE : per-call publish/receive trace
+    - io.aeron                    WARN  : keep Aeron's media driver quiet
+-->
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="uk.co.palmr.gennaker" level="INFO"/>
+    <logger name="uk.co.palmr.gennaker.transport.aeron" level="DEBUG"/>
+    <logger name="io.aeron" level="WARN"/>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

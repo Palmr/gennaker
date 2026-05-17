@@ -27,6 +27,9 @@ import java.util.Map;
 public final class AeronTransport implements Transport {
     /** Aeron channel URI used for all gennaker topics (IPC, named alias). */
     public static final String AERON_URI = "aeron:ipc?alias=gennaker";
+
+    private static final System.Logger LOG = System.getLogger(AeronTransport.class.getName());
+
     private final IdleStrategy idle = new SleepingIdleStrategy();
     private final MediaDriver mediaDriver;
     private final Aeron aeron;
@@ -53,7 +56,11 @@ public final class AeronTransport implements Transport {
 
     @Override
     public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
-        final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> aeron.addPublication(AERON_URI, getStreamId(tc)));
+        final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> {
+            final var streamId = getStreamId(tc);
+            LOG.log(System.Logger.Level.DEBUG, "opened publication for {0} on stream {1}", tc.getName(), streamId);
+            return aeron.addPublication(AERON_URI, streamId);
+        });
         while (pub.offer(message, 0, limit) < 0) {
             idle.idle();
         }
@@ -62,7 +69,11 @@ public final class AeronTransport implements Transport {
 
     @Override
     public void subscribe(final Class<?> topicClass, final MessageHandler handler) {
-        final var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> aeron.addSubscription(AERON_URI, getStreamId(tc)));
+        final var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> {
+            final var streamId = getStreamId(tc);
+            LOG.log(System.Logger.Level.DEBUG, "opened subscription for {0} on stream {1}", tc.getName(), streamId);
+            return aeron.addSubscription(AERON_URI, streamId);
+        });
         final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> handler.onMessage(buf, offset, len));
 
         record SubscriberAgent(Subscription sub, FragmentAssembler handler, String topicName) implements Agent {
