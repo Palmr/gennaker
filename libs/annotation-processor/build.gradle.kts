@@ -5,6 +5,13 @@ plugins {
 
 description = "Annotation processor that generates publisher and subscriber proxies for @Topic interfaces"
 
+tasks.javadoc {
+    // Module contents are consumed via the annotationProcessor Gradle
+    // configuration; only TopicAnnotationProcessor is a documented SPI
+    // entry point. Silence doclint for the internal proxy/shape helpers.
+    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+}
+
 repositories {
     mavenCentral()
 }

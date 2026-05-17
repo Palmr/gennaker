@@ -5,6 +5,15 @@ plugins {
 
 description = "JSON codec for Gennaker — human-readable wire format, zero external runtime dependencies"
 
+tasks.javadoc {
+    // Only JsonMessageCodecGenerator is a documented SPI entry point.
+    // JsonReader and JsonWriter must stay public because the generated
+    // __layout helper classes (emitted into the user's package) call them
+    // across the package boundary, but they are not part of the user-facing
+    // API and are not worth documenting.
+    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+}
+
 repositories {
     mavenCentral()
 }

@@ -21,6 +21,7 @@ public record TypeShape(
         String javaType,
         List<FieldShape> fields
 ) {
+    /** Defensively copies {@code fields} so the shape stays immutable. */
     public TypeShape {
         fields = List.copyOf(fields);
     }

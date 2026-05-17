@@ -30,6 +30,12 @@ public record FieldShape(
     /**
      * Convenience constructor for primitive, string, and object fields (no
      * key type). Sets {@code javaName} equal to {@code name}.
+     *
+     * @param name        wire and Java name of the field
+     * @param kind        classification
+     * @param javaType    fully-qualified Java type string
+     * @param nestedShape shape of the nested type for {@link FieldKind#OBJECT};
+     *                    {@code null} for primitives and strings
      */
     public FieldShape(final String name, final FieldKind kind, final String javaType, final TypeShape nestedShape) {
         this(name, name, kind, javaType, nestedShape, null, null);

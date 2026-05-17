@@ -16,7 +16,14 @@ import org.agrona.concurrent.SleepingIdleStrategy;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class AeronTransport implements Transport {
+/**
+ * {@link Transport} backed by an embedded Aeron media driver. Each topic is
+ * mapped to its own Aeron stream id; publishers offer encoded messages onto
+ * an Aeron {@code Publication} and subscribers consume them via a polling
+ * {@code Agent} thread. Suitable for low-latency inter-process delivery.
+ */
+public final class AeronTransport implements Transport {
+    /** Aeron channel URI used for all gennaker topics (IPC, named alias). */
     public static final String AERON_URI = "aeron:ipc?alias=gennaker";
     private final IdleStrategy idle = new SleepingIdleStrategy();
     private final MediaDriver mediaDriver;
@@ -25,6 +32,10 @@ public class AeronTransport implements Transport {
     private final Map<Class<?>, Publication> publishersByTopic = new IdentityHashMap<>();
     private final Map<Class<?>, Subscription> subscribersByTopic = new IdentityHashMap<>();
 
+    /**
+     * Launches an embedded Aeron media driver and connects an Aeron client to
+     * it. The driver's working directory is deleted on start and on shutdown.
+     */
     public AeronTransport() {
         final var mediaDriverCtx = new MediaDriver.Context()
                 .dirDeleteOnStart(true)

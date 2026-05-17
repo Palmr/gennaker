@@ -20,12 +20,18 @@ package uk.co.palmr.gennaker.layout;
 public interface Layout<T> {
 
     /**
-     * Encode {@code value} into the given sink.
+     * Encodes {@code value} into the given sink.
+     *
+     * @param value the value to encode
+     * @param sink  the codec-supplied sink to write fields into
      */
     void encode(T value, EncodeSink sink);
 
     /**
-     * Decode a value of type {@code T} from the given source.
+     * Decodes a value of type {@code T} from the given source.
+     *
+     * @param source the codec-supplied source to read fields from
+     * @return the decoded value
      */
     T decode(DecodeSource source);
 }

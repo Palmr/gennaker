@@ -4,6 +4,10 @@ plugins {
 
 group = "uk.co.palmr.gennaker.example"
 
+tasks.javadoc {
+    enabled = false
+}
+
 tasks.spotbugsMain {
     // Scope analysis to hand-written sources. Generated proxies and SBE codecs
     // sit alongside them in build/classes/java/main, but pull in agrona SBE

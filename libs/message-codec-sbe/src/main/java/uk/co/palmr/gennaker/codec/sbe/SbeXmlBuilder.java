@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public final class SbeXmlBuilder {
+final class SbeXmlBuilder {
     private final String packageName;
     private final String interfaceName;
     private final SbeTypes sbeTypes;

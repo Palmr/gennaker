@@ -7,8 +7,17 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DirectTransport implements Transport {
+/**
+ * {@link Transport} that delivers messages in-process by invoking each
+ * subscriber's generated proxy directly on the publishing thread. Useful for
+ * tests and single-JVM topologies where no inter-process delivery is needed.
+ */
+public final class DirectTransport implements Transport {
     private final Map<Class<?>, List<Object>> subscribersByTopic = new IdentityHashMap<>();
+
+    /** Creates a new in-process transport with no subscribers registered. */
+    public DirectTransport() {
+    }
 
     @SuppressWarnings("unchecked")
     @Override

@@ -6,7 +6,7 @@ import javax.lang.model.element.VariableElement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SbeTypes {
+class SbeTypes {
     private static final Map<String, SbeType> BASE_SBE_TYPES = Map.of(
             "boolean", new SbeType("BooleanType", false),
             "char", new SbeType("char", false),

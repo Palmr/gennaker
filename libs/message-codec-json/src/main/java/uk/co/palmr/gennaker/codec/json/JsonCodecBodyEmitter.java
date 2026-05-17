@@ -15,13 +15,13 @@ import java.util.Map;
  * The {@code "m"} field is always emitted first so the subscriber can pick
  * which method to dispatch to before parsing the argument list.
  */
-public final class JsonCodecBodyEmitter implements CodecBodyEmitter {
+final class JsonCodecBodyEmitter implements CodecBodyEmitter {
     private final String interfaceName;
     private final int maxMessageSize;
     private final List<ExecutableElement> methods;
     private final Map<String, TypeShape> reachableTypes;
 
-    public JsonCodecBodyEmitter(final String interfaceName,
+    JsonCodecBodyEmitter(final String interfaceName,
                                 final int maxMessageSize,
                                 final List<ExecutableElement> methods,
                                 final Map<String, TypeShape> reachableTypes) {

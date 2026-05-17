@@ -8,7 +8,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PublisherProxyBuilder implements JavaProxy {
+public final class PublisherProxyBuilder implements JavaProxy {
     public static final String PROXY_SUFFIX = "__pub_proxy";
     private final String packageName;
     private final String interfaceName;

@@ -12,16 +12,46 @@ import java.util.Map;
  * {@link javax.annotation.processing.Filer Filer}.
  */
 public interface TopicContext {
+    /**
+     * Returns the active javac processing environment.
+     *
+     * @return the processing environment (for filer, messager, and type-utility access)
+     */
     ProcessingEnvironment processingEnv();
 
+    /**
+     * Returns the topic interface being processed.
+     *
+     * @return the {@code @Topic}-annotated interface
+     */
     TypeElement topicInterface();
 
+    /**
+     * Returns the package the proxies will be emitted into.
+     *
+     * @return the topic interface's package name
+     */
     String packageName();
 
+    /**
+     * Returns the simple name of the topic interface.
+     *
+     * @return the topic interface's simple name
+     */
     String interfaceName();
 
+    /**
+     * Returns the per-topic encoded-message size budget.
+     *
+     * @return the {@code maxMessageSize} declared on {@code @Topic}
+     */
     int maxMessageSize();
 
+    /**
+     * Returns the methods declared on the topic interface.
+     *
+     * @return the methods in declaration order
+     */
     List<ExecutableElement> methods();
 
     /**
@@ -29,6 +59,8 @@ public interface TopicContext {
      * method parameters. Keyed by fully-qualified Java type name.
      *
      * <p>Empty when the topic uses only primitives and {@link String}.
+     *
+     * @return reachable type shapes keyed by fully-qualified Java type name
      */
     Map<String, TypeShape> reachableTypes();
 }

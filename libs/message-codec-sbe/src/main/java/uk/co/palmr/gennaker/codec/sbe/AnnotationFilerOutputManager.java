@@ -19,15 +19,15 @@ import java.io.Writer;
  * the parent {@code JavaOutputManager} manages. The file is already registered
  * with javac from the first creation, so it will still be compiled.
  */
-public class AnnotationFilerOutputManager extends JavaOutputManager {
+class AnnotationFilerOutputManager extends JavaOutputManager {
     private final String packageName;
     private final ProcessingEnvironment processingEnv;
     private final TypeElement interfaceElement;
 
-    public AnnotationFilerOutputManager(final String baseDirName,
-                                        final String packageName,
-                                        final ProcessingEnvironment processingEnv,
-                                        final TypeElement interfaceElement) {
+    AnnotationFilerOutputManager(final String baseDirName,
+                                 final String packageName,
+                                 final ProcessingEnvironment processingEnv,
+                                 final TypeElement interfaceElement) {
         super(baseDirName, packageName);
         this.packageName = packageName;
         this.processingEnv = processingEnv;

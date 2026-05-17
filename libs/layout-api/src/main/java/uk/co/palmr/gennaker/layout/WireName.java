@@ -24,5 +24,10 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.RECORD_COMPONENT, ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
 public @interface WireName {
+    /**
+     * The wire name to use in place of the Java identifier.
+     *
+     * @return the override wire name
+     */
     String value();
 }

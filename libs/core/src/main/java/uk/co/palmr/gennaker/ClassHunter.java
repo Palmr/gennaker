@@ -2,7 +2,7 @@ package uk.co.palmr.gennaker;
 
 import java.lang.reflect.InvocationTargetException;
 
-public final class ClassHunter {
+final class ClassHunter {
     static final String PUB_PROXY_CLASS_SUFFIX = "__pub_proxy";
     static final String SUB_PROXY_CLASS_SUFFIX = "__sub_proxy";
 

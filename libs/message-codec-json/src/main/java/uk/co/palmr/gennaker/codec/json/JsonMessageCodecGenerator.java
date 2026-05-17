@@ -13,8 +13,22 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+/**
+ * JSON {@link MessageCodecGenerator}. Generates a {@code __layout} helper
+ * class per reachable record type and returns a {@link JsonCodecBodyEmitter}
+ * that wires those helpers into the publisher and subscriber proxies.
+ *
+ * <p>Selected per topic with {@code @Topic(messageCodec = Codecs.JSON)}.
+ *
+ * <p>Registered as a service via {@link AutoService} — adding this module to
+ * the {@code annotationProcessor} configuration is all that's required.
+ */
 @AutoService(MessageCodecGenerator.class)
-public class JsonMessageCodecGenerator implements MessageCodecGenerator {
+public final class JsonMessageCodecGenerator implements MessageCodecGenerator {
+
+    /** Public no-arg constructor required by {@link java.util.ServiceLoader}. */
+    public JsonMessageCodecGenerator() {
+    }
 
     @Override
     public String name() {

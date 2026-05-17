@@ -32,12 +32,28 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+/**
+ * Annotation processor that emits a publisher and a subscriber proxy for
+ * every {@code @Topic}-annotated interface on the compilation unit.
+ *
+ * <p>Discovers {@link MessageCodecGenerator} implementations on its classpath
+ * via {@link ServiceLoader} and dispatches each topic to the codec named in
+ * {@code @Topic(messageCodec = ...)}.
+ *
+ * <p>Registered as a service via {@link AutoService} — users just put the
+ * module on their {@code annotationProcessor} configuration; no manual
+ * wiring needed.
+ */
 @SupportedAnnotationTypes({"uk.co.palmr.gennaker.annotations.Topic"})
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 @AutoService(Processor.class)
-public class TopicAnnotationProcessor extends AbstractProcessor {
+public final class TopicAnnotationProcessor extends AbstractProcessor {
 
     private Map<String, MessageCodecGenerator> codecs;
+
+    /** Public no-arg constructor required by the {@link Processor} SPI. */
+    public TopicAnnotationProcessor() {
+    }
 
     @Override
     public synchronized void init(final ProcessingEnvironment processingEnv) {

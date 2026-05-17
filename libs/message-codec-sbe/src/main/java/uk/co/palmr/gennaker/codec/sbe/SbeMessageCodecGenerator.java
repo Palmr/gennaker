@@ -17,8 +17,24 @@ import java.nio.file.Path;
 import static uk.co.real_logic.sbe.SbeTool.parseSchema;
 import static uk.co.real_logic.sbe.generation.TargetCodeGeneratorLoader.precedenceChecks;
 
+/**
+ * SBE {@link MessageCodecGenerator}. Derives an SBE schema from the topic's
+ * methods and reachable record types, runs the SBE tool to generate encoder
+ * and decoder classes, and returns a {@link SbeCodecBodyEmitter} that wires
+ * those into the publisher and subscriber proxies.
+ *
+ * <p>Default codec when no {@code messageCodec} is set on {@code @Topic};
+ * also selectable explicitly with {@code @Topic(messageCodec = Codecs.SBE)}.
+ *
+ * <p>Registered as a service via {@link AutoService} — adding this module to
+ * the {@code annotationProcessor} configuration is all that's required.
+ */
 @AutoService(MessageCodecGenerator.class)
-public class SbeMessageCodecGenerator implements MessageCodecGenerator {
+public final class SbeMessageCodecGenerator implements MessageCodecGenerator {
+
+    /** Public no-arg constructor required by {@link java.util.ServiceLoader}. */
+    public SbeMessageCodecGenerator() {
+    }
 
     @Override
     public String name() {

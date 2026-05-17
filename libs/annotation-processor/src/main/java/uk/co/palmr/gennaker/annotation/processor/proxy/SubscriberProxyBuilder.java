@@ -5,7 +5,7 @@ import uk.co.palmr.gennaker.codec.CodecBodyEmitter;
 import java.io.IOException;
 import java.io.Writer;
 
-public class SubscriberProxyBuilder implements JavaProxy {
+public final class SubscriberProxyBuilder implements JavaProxy {
     public static final String PROXY_SUFFIX = "__sub_proxy";
     private final String packageName;
     private final String interfaceName;

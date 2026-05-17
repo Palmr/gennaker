@@ -20,6 +20,8 @@ public interface CodecBodyEmitter {
      * the {@code package} statement. Must include the import for
      * {@code uk.co.palmr.gennaker.Transport} and end with a trailing blank
      * line.
+     *
+     * @return Java source for the publisher proxy's import block
      */
     String publisherImports();
 
@@ -28,6 +30,8 @@ public interface CodecBodyEmitter {
      * immediately before the (shell-owned) {@code transport} field. Each
      * declaration should end with a newline; the block as a whole should end
      * with a newline.
+     *
+     * @return Java source for the publisher proxy's extra fields
      */
     String publisherFields();
 
@@ -36,6 +40,9 @@ public interface CodecBodyEmitter {
      * braces of the method declaration). The shell is responsible for emitting
      * the {@code @Override}, the signature, and the closing brace. Lines
      * should be indented eight spaces. The block should end with a newline.
+     *
+     * @param method the topic-interface method being proxied
+     * @return Java source for the method body
      */
     String publisherMethodBody(ExecutableElement method);
 
@@ -44,18 +51,24 @@ public interface CodecBodyEmitter {
      * for {@code org.agrona.DirectBuffer} and
      * {@code uk.co.palmr.gennaker.MessageHandler} and end with a trailing
      * blank line.
+     *
+     * @return Java source for the subscriber proxy's import block
      */
     String subscriberImports();
 
     /**
      * Field declarations injected into the subscriber proxy class body
      * immediately before the (shell-owned) {@code delegate} field.
+     *
+     * @return Java source for the subscriber proxy's extra fields
      */
     String subscriberFields();
 
     /**
      * Body of {@code onMessage(DirectBuffer buffer, int offset, int length)}.
      * The shell emits the method signature and the closing brace.
+     *
+     * @return Java source for the subscriber's {@code onMessage} body
      */
     String subscriberOnMessageBody();
 }

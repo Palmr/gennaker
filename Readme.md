@@ -114,8 +114,7 @@ API isn't very fleshed out yet.
 
 **Transports**
 
-- [ ] Annotation-driven transport selection (the `Transport` enum exists but
-      isn't wired)
+- [ ] Annotation-driven transport selection
 - [ ] Batching / transactional sends
 - [ ] Backpressure: configurable block-vs-drop when the queue is full
 - [ ] Reliability levels (at-most-once / at-least-once)

@@ -15,16 +15,16 @@ import java.util.stream.Collectors;
  * SBE-specific {@link CodecBodyEmitter} that produces the body fragments
  * referencing the SBE-generated encoder/decoder classes.
  */
-public final class SbeCodecBodyEmitter implements CodecBodyEmitter {
+final class SbeCodecBodyEmitter implements CodecBodyEmitter {
     private final String interfaceName;
     private final int maxMessageSize;
     private final List<ExecutableElement> methods;
     private final Map<String, TypeShape> reachableTypes;
 
-    public SbeCodecBodyEmitter(final String interfaceName,
-                               final int maxMessageSize,
-                               final List<ExecutableElement> methods,
-                               final Map<String, TypeShape> reachableTypes) {
+    SbeCodecBodyEmitter(final String interfaceName,
+                        final int maxMessageSize,
+                        final List<ExecutableElement> methods,
+                        final Map<String, TypeShape> reachableTypes) {
         this.interfaceName = interfaceName;
         this.maxMessageSize = maxMessageSize;
         this.methods = List.copyOf(methods);
