@@ -38,7 +38,7 @@ For each `@Topic`-annotated interface, the annotation processor:
 2. Asks the codec to do any codec-specific work (e.g. SBE generates encoder/
    decoder classes from a derived schema; JSON has no side-files).
 3. Generates a publisher proxy that implements the interface and a
-   subscriber proxy that implements `MessageHandler`, both wired to the
+   subscriber proxy that implements `MessageHandler<T>`, both wired to the
    chosen `Transport`.
 
 Codecs are discovered via `java.util.ServiceLoader`, so adding a new wire
@@ -48,9 +48,10 @@ it.
 ## Modules
 
 ```
-:libs:core                 # runtime: Gennaker entry point, Transport SPI, DirectTransport
+:libs:core                 # runtime: Gennaker entry point, DirectTransport, RecordingTransport
 :libs:annotations          # @Topic and Codecs constants, the only module users see
 :libs:annotation-processor # discovers codecs, generates proxy shells
+:libs:transport-spi        # Transport and MessageHandler interfaces, shared by runtime, proxies, and codec tests
 :libs:codec-spi            # MessageCodecGenerator / CodecBodyEmitter / TopicContext
 :libs:message-codec-sbe    # SBE codec (binary, schema-derived, fast)
 :libs:message-codec-json   # JSON codec (human-readable, easier debugging)
@@ -153,7 +154,7 @@ API isn't very fleshed out yet.
 ./gradlew build
 ```
 
-Requires JDK 21. The example uses Aeron, which needs
+Requires JDK 25. The example uses Aeron, which needs
 `--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED` (already wired into
 the build).
 
