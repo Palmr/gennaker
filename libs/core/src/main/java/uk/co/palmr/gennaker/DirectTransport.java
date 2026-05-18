@@ -7,15 +7,13 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * {@link Transport} that delivers messages in-process by invoking each
- * subscribed handler directly on the publishing thread. Useful for tests and
- * single-JVM topologies where no inter-process delivery is needed.
- */
+/// [Transport] that delivers messages in-process by invoking each subscribed
+/// handler directly on the publishing thread. Useful for tests and single-JVM
+/// topologies where no inter-process delivery is needed.
 public final class DirectTransport implements Transport {
     private final Map<Class<?>, List<MessageHandler>> handlersByTopic = new IdentityHashMap<>();
 
-    /** Creates a new in-process transport with no subscribers registered. */
+    /// Creates a new in-process transport with no subscribers registered.
     public DirectTransport() {
     }
 
