@@ -45,7 +45,7 @@ import java.util.Set;
  * wiring needed.
  */
 @SupportedAnnotationTypes({"uk.co.palmr.gennaker.annotations.Topic"})
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
+@SupportedSourceVersion(SourceVersion.RELEASE_25)
 @AutoService(Processor.class)
 public final class TopicAnnotationProcessor extends AbstractProcessor {
 

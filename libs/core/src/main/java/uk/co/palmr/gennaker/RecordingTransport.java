@@ -46,7 +46,7 @@ public final class RecordingTransport implements Transport {
     public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         final byte[] copy = new byte[limit];
         message.getBytes(0, copy, 0, limit);
-        bytesByTopic.computeIfAbsent(topicClass, c -> new ArrayList<>()).add(copy);
+        bytesByTopic.computeIfAbsent(topicClass, _ -> new ArrayList<>()).add(copy);
         return delegate.publish(topicClass, message, limit);
     }
 
@@ -116,7 +116,7 @@ public final class RecordingTransport implements Transport {
         if (list == null) {
             return;
         }
-        final MessageHandler handler = ClassHunter.getSubscriberProxy(topicClass, topicImplementation);
+        final MessageHandler<T> handler = ClassHunter.getSubscriberProxy(topicClass, topicImplementation);
         for (final byte[] bytes : list) {
             handler.onMessage(new UnsafeBuffer(bytes), 0, bytes.length);
         }

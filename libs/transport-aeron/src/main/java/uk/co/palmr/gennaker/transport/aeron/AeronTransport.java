@@ -74,7 +74,7 @@ public final class AeronTransport implements Transport {
             LOG.log(System.Logger.Level.DEBUG, "opened subscription for {0} on stream {1}", tc.getName(), streamId);
             return aeron.addSubscription(AERON_URI, streamId);
         });
-        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, header) -> handler.onMessage(buf, offset, len));
+        final var fragmentAssembler = new FragmentAssembler((buf, offset, len, _) -> handler.onMessage(buf, offset, len));
 
         record SubscriberAgent(Subscription sub, FragmentAssembler handler, String topicName) implements Agent {
             @Override
