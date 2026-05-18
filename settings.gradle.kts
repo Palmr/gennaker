@@ -8,5 +8,6 @@ include(
     ":libs:layout-api",
     ":libs:message-codec-json",
     ":libs:message-codec-sbe",
-    ":libs:transport-aeron"
+    ":libs:transport-aeron",
+    ":libs:transport-spi"
 )

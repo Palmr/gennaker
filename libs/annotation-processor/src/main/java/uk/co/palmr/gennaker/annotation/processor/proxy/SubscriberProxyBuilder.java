@@ -31,10 +31,10 @@ public final class SubscriberProxyBuilder implements JavaProxy {
         writer.write("package %s;%n%n".formatted(packageName));
         writer.write(emitter.subscriberImports());
         writer.write("""
-                public class %s implements MessageHandler {
+                public class %s implements MessageHandler<%s> {
                     private static final java.lang.System.Logger LOG = java.lang.System.getLogger("%s.%s");
 
-                """.formatted(className, packageName, interfaceName));
+                """.formatted(className, interfaceName, packageName, interfaceName));
         writer.write(emitter.subscriberFields());
         writer.write("""
                     private final %s delegate;

@@ -27,4 +27,5 @@ dependencies {
     testImplementation(libs.bundles.testing)
     testImplementation(libs.compileTesting)
     testImplementation(libs.agrona)
+    testImplementation(project(":libs:transport-spi"))
 }

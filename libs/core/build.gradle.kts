@@ -7,6 +7,7 @@ description = "Gennaker runtime — Gennaker entry point, Transport SPI, Message
 
 dependencies {
     api(project(":libs:annotations"))
+    api(project(":libs:transport-spi"))
     api(libs.agrona)
 
     testImplementation(libs.bundles.testing)

@@ -51,7 +51,7 @@ public final class AeronTransport implements Transport {
     }
 
     @Override
-    public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
+    public <T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         final var pub = publishersByTopic.computeIfAbsent(topicClass, tc -> {
             final var streamId = getStreamId(tc);
             LOG.log(System.Logger.Level.DEBUG, "opened publication for {0} on stream {1}", tc.getName(), streamId);
@@ -64,7 +64,7 @@ public final class AeronTransport implements Transport {
     }
 
     @Override
-    public void subscribe(final Class<?> topicClass, final MessageHandler handler) {
+    public <T> void subscribe(final Class<T> topicClass, final MessageHandler<T> handler) {
         final var sub = subscribersByTopic.computeIfAbsent(topicClass, tc -> {
             final var streamId = getStreamId(tc);
             LOG.log(System.Logger.Level.DEBUG, "opened subscription for {0} on stream {1}", tc.getName(), streamId);

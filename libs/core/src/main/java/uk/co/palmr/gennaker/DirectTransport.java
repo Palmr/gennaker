@@ -11,21 +11,21 @@ import java.util.Map;
 /// handler directly on the publishing thread. Useful for tests and single-JVM
 /// topologies where no inter-process delivery is needed.
 public final class DirectTransport implements Transport {
-    private final Map<Class<?>, List<MessageHandler>> handlersByTopic = new IdentityHashMap<>();
+    private final Map<Class<?>, List<MessageHandler<?>>> handlersByTopic = new IdentityHashMap<>();
 
     /// Creates a new in-process transport with no subscribers registered.
     public DirectTransport() {
     }
 
     @Override
-    public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
+    public <T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         handlersByTopic.get(topicClass).forEach(handler -> handler.onMessage(message, 0, limit));
         return true;
     }
 
     @Override
-    public void subscribe(final Class<?> topicClass, final MessageHandler handler) {
-        handlersByTopic.computeIfAbsent(topicClass, c -> new ArrayList<>()).add(handler);
+    public <T> void subscribe(final Class<T> topicClass, final MessageHandler<T> handler) {
+        handlersByTopic.computeIfAbsent(topicClass, _ -> new ArrayList<>()).add(handler);
     }
 
     @Override

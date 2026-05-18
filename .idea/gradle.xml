@@ -31,6 +31,7 @@
             <option value="$PROJECT_DIR$/libs/message-codec-json" />
             <option value="$PROJECT_DIR$/libs/message-codec-sbe" />
             <option value="$PROJECT_DIR$/libs/transport-aeron" />
+            <option value="$PROJECT_DIR$/libs/transport-spi" />
           </set>
         </option>
       </GradleProjectSettings>

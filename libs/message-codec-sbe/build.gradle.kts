@@ -22,4 +22,5 @@ dependencies {
     testImplementation(libs.bundles.testing)
     testImplementation(libs.compileTesting)
     testImplementation(project(":libs:annotation-processor"))
+    testImplementation(project(":libs:transport-spi"))
 }

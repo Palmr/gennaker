@@ -39,7 +39,7 @@ public final class RecordingTransport implements Transport {
     }
 
     @Override
-    public <T, I extends T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
+    public <T> boolean publish(final Class<T> topicClass, final DirectBuffer message, final int limit) {
         final byte[] copy = new byte[limit];
         message.getBytes(0, copy, 0, limit);
         bytesByTopic.computeIfAbsent(topicClass, _ -> new ArrayList<>()).add(copy);
@@ -47,7 +47,7 @@ public final class RecordingTransport implements Transport {
     }
 
     @Override
-    public void subscribe(final Class<?> topicClass, final MessageHandler handler) {
+    public <T> void subscribe(final Class<T> topicClass, final MessageHandler<T> handler) {
         delegate.subscribe(topicClass, handler);
     }
 

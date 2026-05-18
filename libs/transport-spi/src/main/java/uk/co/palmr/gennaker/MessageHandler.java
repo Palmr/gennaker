@@ -5,9 +5,13 @@ import org.agrona.DirectBuffer;
 
 /// Receives raw encoded messages from a transport. Generated subscriber
 /// proxies implement this interface to decode the bytes and dispatch to user
-/// code; transports invoke [#onMessage] once per inbound message.
+/// code; transports invoke [#onMessage] once per inbound message. The type
+/// parameter marks the topic interface this handler is bound to, letting the
+/// transport SPI keep handler/topic pairings type-safe at compile time.
+///
+/// @param <T> the topic interface this handler is bound to
 @FunctionalInterface
-public interface MessageHandler {
+public interface MessageHandler<T> {
     /// Called by the transport when an encoded message arrives.
     ///
     /// @param buffer the buffer containing the encoded message

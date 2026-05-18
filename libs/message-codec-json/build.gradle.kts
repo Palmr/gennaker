@@ -29,4 +29,5 @@ dependencies {
     testImplementation(libs.agrona)
     testImplementation(project(":libs:annotation-processor"))
     testImplementation(project(":libs:layout-api"))
+    testImplementation(project(":libs:transport-spi"))
 }

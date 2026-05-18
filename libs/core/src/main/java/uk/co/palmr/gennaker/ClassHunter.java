@@ -37,10 +37,11 @@ final class ClassHunter {
         }
     }
 
-    static <T, I extends T> MessageHandler getSubscriberProxy(final Class<T> topicClass, final I topicImplementation) {
+    static <T, I extends T> MessageHandler<T> getSubscriberProxy(final Class<T> topicClass, final I topicImplementation) {
         final MethodHandle constructor = SUBSCRIBER_CONSTUCTORS.get(topicClass);
         try {
-            return (MessageHandler) constructor.invoke(topicImplementation);
+            //noinspection unchecked
+            return (MessageHandler<T>) constructor.invoke(topicImplementation);
         }
         catch (Throwable t) {
             throw new GennakerException(
