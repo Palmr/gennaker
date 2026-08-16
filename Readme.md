@@ -174,14 +174,14 @@ centralPassword=<token-password>
 Bump the version in `build.gradle.kts` (remove `-SNAPSHOT`), then:
 
 ```bash
-./gradlew publishAllPublicationsToCentralPortal
+./gradlew publishAggregationToCentralPortal
 ```
 
-Each module is uploaded as a separate deployment bundle. All should show as `VALIDATED` on the portal.
+All modules are uploaded as a single deployment bundle, which should show as `VALIDATED` on the portal.
 
 **3. Publish**
 
-Log into [central.sonatype.com](https://central.sonatype.com) → Deployments. Review the bundles, then click **Publish** on each. Artifacts appear on Maven Central within ~30 minutes.
+Log into [central.sonatype.com](https://central.sonatype.com) → Deployments. Review the bundle, then click **Publish**. Artifacts appear on Maven Central within ~30 minutes.
 
 If anything looks wrong, click **Drop** instead — nothing will be published.
 

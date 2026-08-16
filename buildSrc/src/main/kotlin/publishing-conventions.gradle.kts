@@ -53,11 +53,3 @@ signing {
     useGpgCmd()
     sign(publishing.publications["mavenJava"])
 }
-
-nmcp {
-    centralPortal {
-        username = providers.gradleProperty("centralUsername")
-        password = providers.gradleProperty("centralPassword")
-        publishingType = "USER_MANAGED"
-    }
-}

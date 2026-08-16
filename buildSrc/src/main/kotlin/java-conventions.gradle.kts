@@ -10,7 +10,7 @@ plugins {
 
 checkstyle {
     maxWarnings = 0
-    toolVersion = "10.20.1"
+    toolVersion = "13.10.0"
 }
 
 repositories {
